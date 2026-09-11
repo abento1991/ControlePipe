@@ -12,9 +12,12 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   const sp = await searchParams;
   if (user) redirect(sp.callbackUrl && sp.callbackUrl.startsWith("/") ? sp.callbackUrl : "/pipeline");
   const shared = !!process.env.APP_PASSWORD;
-  const users = await prisma.user
-    .findMany({ where: { isActive: true, isArchived: false, ...(shared ? { email: { not: "equipe@letocapital.com.br" } } : { passwordHash: { not: null } }) }, orderBy: { name: "asc" }, select: { name: true, email: true, initials: true, color: true } })
-    .catch(() => []);
+  // In shared mode the roster is only revealed after the team password is confirmed (see verifySharedPassword).
+  const users = shared
+    ? []
+    : await prisma.user
+        .findMany({ where: { isActive: true, isArchived: false, passwordHash: { not: null } }, orderBy: { name: "asc" }, select: { name: true, email: true, initials: true, color: true } })
+        .catch(() => []);
   return (
     <div className="min-h-screen grid lg:grid-cols-[1.1fr_1fr]">
       <div className="hidden lg:flex flex-col justify-between bg-black text-white p-12 relative overflow-hidden">
@@ -35,7 +38,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           </div>
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-leto-green-deep mb-1">Special Situations</p>
           <h2 className="text-xl font-semibold tracking-tight">Entrar</h2>
-          <p className="text-sm text-muted-foreground mt-1 mb-6">{shared ? "Digite a senha de acesso da equipe." : "Escolha seu nome e digite a senha da equipe."}</p>
+          <p className="text-sm text-muted-foreground mt-1 mb-6">{shared ? "Digite a senha de acesso da equipe." : "Escolha seu nome e digite sua senha."}</p>
           <LoginForm callbackUrl={sp.callbackUrl} initialError={sp.error} users={users} shared={shared} />
         </div>
       </div>
