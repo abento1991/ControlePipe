@@ -124,7 +124,7 @@ export function ChartCard({ title, description, period, children, highlights, cl
               ) : null}
             </div>
             <div className="mt-4 flex items-center justify-between text-2xs text-leto-stone">
-              <span>Leto Capital · Special Situations · Leto Pipeline</span>
+              <span>Leto Capital · Special Situations</span>
               <span>{new Date().toLocaleDateString("pt-BR")}</span>
             </div>
           </div>

@@ -14,7 +14,7 @@ export default async function OperationTypesPage() {
   ]);
   return (
     <>
-      <PageHeader eyebrow="Administração" title="Tipos de operação — de/para" description="Cada grafia encontrada na planilha (operation_type_raw) aponta para um tipo normalizado. Alterar o de/para reclassifica todas as oportunidades com aquele valor original; o valor original nunca é alterado." />
+      <PageHeader eyebrow="Special Situations · Administração" title="Tipos de operação — de/para" description="Cada grafia encontrada na planilha (operation_type_raw) aponta para um tipo normalizado. Alterar o de/para reclassifica todas as oportunidades com aquele valor original; o valor original nunca é alterado." />
       <TypeMappingsAdmin mappings={mappings.map((m) => ({ id: m.id, rawValue: m.rawValue, operationTypeId: m.operationTypeId, confidence: m.confidence, source: m.source, occurrences: m.occurrences, needsReview: m.needsReview }))} types={types.map((t) => ({ id: t.id, name: t.name, slug: t.slug, category: t.category, color: t.color, description: t.description, isActive: t.isActive, count: t._count.opportunities }))} />
     </>
   );

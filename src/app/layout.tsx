@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 export const metadata: Metadata = {
-  title: { default: "Leto Pipeline", template: "%s · Leto Pipeline" },
+  title: { default: "Leto Special Situations", template: "%s · Leto Special Situations" },
   description: "Origination & Opportunities CRM — Leto Capital Special Situations",
   icons: { icon: "/brand/leto-icon.svg", apple: "/brand/leto-icon.svg" },
 };

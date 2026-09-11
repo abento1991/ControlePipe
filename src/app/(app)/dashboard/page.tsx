@@ -25,7 +25,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const n = countActiveFilters(filters);
   return (
     <>
-      <PageHeader eyebrow="Leto Capital · Special Situations" title="Dashboard" description={sp.forbidden ? "Acesso restrito a administradores." : `Indicadores calculados diretamente do banco · ${periodLabel}${n ? ` · ${n} filtro(s) ativo(s)` : ""}`} />
+      <PageHeader title="Dashboard" description={sp.forbidden ? "Acesso restrito a administradores." : `Indicadores calculados diretamente do banco · ${periodLabel}${n ? ` · ${n} filtro(s) ativo(s)` : ""}`} />
       <div className="mb-4">
         <FiltersBar page="dashboard" years={options.years} companies={options.companies} views={viewDTOs} currentUserId={user.id} show={{ aging: false, flags: false }} />
       </div>

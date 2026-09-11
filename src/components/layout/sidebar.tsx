@@ -65,8 +65,8 @@ export function Sidebar({ collapsed, onToggle, isAdmin, mobileOpen, onMobileClos
       </div>
       {!collapsed && (
         <div className="px-4 pt-4 pb-1">
-          <p className="text-[11px] font-semibold tracking-wide text-white">Leto Pipeline</p>
-          <p className="text-[10px] text-sidebar-muted">Origination &amp; Opportunities CRM</p>
+          <p className="text-[13px] font-bold uppercase tracking-[0.18em] text-leto-green">Special Situations</p>
+          <p className="text-[10px] text-sidebar-muted mt-0.5">Pipeline de originação &amp; oportunidades</p>
         </div>
       )}
       <nav className={cn("flex-1 overflow-y-auto px-3 py-3 space-y-0.5", collapsed && "px-2")}>

@@ -11,6 +11,7 @@ export function Topbar({ onMenu }: { onMenu: () => void }) {
       <button className="lg:hidden text-muted-foreground" onClick={onMenu} aria-label="Menu">
         <Menu className="h-5 w-5" />
       </button>
+      <span className="lg:hidden text-2xs font-bold uppercase tracking-[0.16em] text-leto-green-deep whitespace-nowrap">Special Situations</span>
       <GlobalSearch />
       <div className="ml-auto flex items-center gap-2">
         <NewOpportunityButton />

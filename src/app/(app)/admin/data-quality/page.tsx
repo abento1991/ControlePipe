@@ -29,7 +29,7 @@ export default async function DataQualityPage({ searchParams }: { searchParams: 
   const counts = [...merged.values()].sort((a, b) => order[a.severity] - order[b.severity] || b.count - a.count);
   return (
     <>
-      <PageHeader eyebrow="Administração" title="Data Quality" description="Problemas detectados na importação: nomes/datas ausentes, anos inconsistentes, originadores não classificados, tipos e responsáveis não normalizados, duplicidades. Corrija na oportunidade (Editar / Corrigir vínculo) ou no de/para de tipos, depois marque como resolvido." />
+      <PageHeader eyebrow="Special Situations · Administração" title="Data Quality" description="Problemas detectados na importação: nomes/datas ausentes, anos inconsistentes, originadores não classificados, tipos e responsáveis não normalizados, duplicidades. Corrija na oportunidade (Editar / Corrigir vínculo) ou no de/para de tipos, depois marque como resolvido." />
       <DataQualityAdmin issues={issues.map((i) => ({ id: i.id, code: i.code, severity: i.severity, entity: i.entity, entityId: i.entityId, message: i.message, resolved: i.resolved, resolvedAt: i.resolvedAt?.toISOString() ?? null, resolutionNote: i.resolutionNote, createdAt: i.createdAt.toISOString(), opportunity: i.opportunity, details: (i.details as Record<string, unknown> | null) ?? null }))} counts={counts} code={sp.code ?? null} showResolved={showResolved} total={total} />
     </>
   );

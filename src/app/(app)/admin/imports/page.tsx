@@ -13,7 +13,7 @@ export default async function ImportsPage() {
   const rowStats = await prisma.importRow.groupBy({ by: ["sheet", "status"], _count: true, orderBy: { sheet: "asc" } });
   return (
     <>
-      <PageHeader eyebrow="Administração" title="Importações" description="Histórico das execuções de `npm run import:pipeline`. A importação é idempotente: linhas identificadas por (arquivo, aba, linha) e oportunidades pelo # legado." />
+      <PageHeader eyebrow="Special Situations · Administração" title="Importações" description="Histórico das execuções de `npm run import:pipeline`. A importação é idempotente: linhas identificadas por (arquivo, aba, linha) e oportunidades pelo # legado." />
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         <div className="xl:col-span-2 rounded-lg border bg-card shadow-card overflow-hidden">
           <table className="w-full text-xs">

@@ -35,7 +35,7 @@ export default async function AuditPage({ searchParams }: { searchParams: Promis
   };
   return (
     <>
-      <PageHeader eyebrow="Administração" title="Auditoria" description="Toda alteração relevante (status, valor, responsáveis, originador, encerramento, reativação) registra usuário, data, campo, valor anterior e novo." />
+      <PageHeader eyebrow="Special Situations · Administração" title="Auditoria" description="Toda alteração relevante (status, valor, responsáveis, originador, encerramento, reativação) registra usuário, data, campo, valor anterior e novo." />
       <form className="flex flex-wrap gap-2 mb-3 text-xs" method="get">
         <input name="q" defaultValue={sp.q ?? ""} placeholder="Buscar por oportunidade ou valor…" className="h-8 rounded-md border bg-card px-3 w-64" />
         <select name="entity" defaultValue={sp.entity ?? ""} className="h-8 rounded-md border bg-card px-2">
