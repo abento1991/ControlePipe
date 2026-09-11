@@ -21,11 +21,13 @@ export async function seedReferenceData(prisma: PrismaClient, opts: { passwordHa
     });
   }
   for (const m of TEAM_MEMBERS) {
-    const existing = await prisma.user.findUnique({ where: { email: m.email } });
+    const existing =
+      (await prisma.user.findUnique({ where: { email: m.email } })) ??
+      (m.previousEmails?.length ? await prisma.user.findFirst({ where: { email: { in: m.previousEmails } } }) : null);
     if (existing) {
       await prisma.user.update({
         where: { id: existing.id },
-        data: { name: m.name, isArchived: m.isArchived, color: m.color, initials: initialsOf(m.name.replace(/\(.*\)/, "")), ...(!existing.passwordHash && !m.isArchived && opts.passwordHash ? { passwordHash: opts.passwordHash } : {}) },
+        data: { email: m.email, name: m.name, isArchived: m.isArchived, color: m.color, initials: initialsOf(m.name.replace(/\(.*\)/, "")), ...(!existing.passwordHash && !m.isArchived && opts.passwordHash ? { passwordHash: opts.passwordHash } : {}) },
       });
     } else {
       await prisma.user.create({

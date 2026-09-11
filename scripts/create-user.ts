@@ -1,6 +1,6 @@
 /**
  * Creates or updates an application user.
- *   npm run users:create -- --email vitoria.iglesias@letocapital.com.br --name "Vitória Iglesias" --password "..." [--role ADMIN|USER]
+ *   npm run users:create -- --email viglesias@letocapital.com.br --name "Vitória Iglesias" --password "..." [--role ADMIN|USER]
  */
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";

@@ -101,7 +101,7 @@ npm run import:pipeline         # importa a planilha (idempotente)
 npm run dev                     # http://localhost:3000
 ```
 
-Login inicial: e-mails `antonio.penido@`, `vitoria.iglesias@`, `christopher.soares@`, `luiza.oswald@letocapital.com.br` com a senha definida em `SEED_DEFAULT_PASSWORD` (troque no primeiro acesso pelo menu do usuário → *Alterar senha*). Antônio Penido é criado como **Admin**; os demais como **User** (ajustável em Administração → Usuários).
+Login inicial: e-mails `apenido@`, `viglesias@`, `csoares@`, `loswald@letocapital.com.br` com a senha definida em `SEED_DEFAULT_PASSWORD` (troque no primeiro acesso pelo menu do usuário → *Alterar senha*). Antônio Penido é criado como **Admin**; os demais como **User** (ajustável em Administração → Usuários).
 
 Banco local rápido com Docker:
 
