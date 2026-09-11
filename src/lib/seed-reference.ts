@@ -1,0 +1,42 @@
+import type { PrismaClient } from "@prisma/client";
+import { STATUS_DEFINITIONS } from "./normalization/status";
+import { OPERATION_TYPE_DEFINITIONS } from "./normalization/operation-types";
+import { TEAM_MEMBERS } from "./normalization/assignees";
+import { initialsOf } from "./normalization/text";
+
+/** Idempotently seeds statuses, operation types and team users. Safe to run many times. */
+export async function seedReferenceData(prisma: PrismaClient, opts: { passwordHash?: string | null } = {}) {
+  for (const s of STATUS_DEFINITIONS) {
+    await prisma.opportunityStatus.upsert({
+      where: { key: s.key },
+      update: { name: s.name, group: s.group, outcome: s.outcome, sortOrder: s.sortOrder, color: s.color, isLegacy: !!s.isLegacy },
+      create: { key: s.key, name: s.name, group: s.group, outcome: s.outcome, sortOrder: s.sortOrder, color: s.color, isLegacy: !!s.isLegacy },
+    });
+  }
+  for (const t of OPERATION_TYPE_DEFINITIONS) {
+    await prisma.operationType.upsert({
+      where: { slug: t.slug },
+      update: { name: t.name, category: t.category, color: t.color, sortOrder: t.sortOrder, description: t.description },
+      create: { slug: t.slug, name: t.name, category: t.category, color: t.color, sortOrder: t.sortOrder, description: t.description },
+    });
+  }
+  for (const m of TEAM_MEMBERS) {
+    const existing = await prisma.user.findUnique({ where: { email: m.email } });
+    if (existing) {
+      await prisma.user.update({ where: { id: existing.id }, data: { name: m.name, isArchived: m.isArchived, color: m.color, initials: initialsOf(m.name.replace(/\(.*\)/, "")) } });
+    } else {
+      await prisma.user.create({
+        data: {
+          name: m.name,
+          email: m.email,
+          role: m.key === "antonio" ? "ADMIN" : "USER",
+          isArchived: m.isArchived,
+          isActive: !m.isArchived,
+          color: m.color,
+          initials: initialsOf(m.name.replace(/\(.*\)/, "")),
+          passwordHash: m.isArchived ? null : opts.passwordHash ?? null,
+        },
+      });
+    }
+  }
+}

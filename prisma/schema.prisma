@@ -1,0 +1,593 @@
+// Leto Pipeline — Prisma schema
+// PostgreSQL. All historical values from the spreadsheet are preserved in *_raw columns
+// and in ImportRow.rawData (raw_import_data). Normalized values live in the relational
+// columns (normalized_data). Nothing from the workbook is ever discarded.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Users & auth
+// ─────────────────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String?
+  role         UserRole @default(USER)
+  initials     String?
+  color        String?
+  isActive     Boolean  @default(true)
+  /// Archived users are legacy team members that appear in the spreadsheet but are no longer on the team.
+  isArchived   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  assignments      OpportunityAssignee[]
+  activities       Activity[]
+  notes            Note[]
+  auditLogs        AuditLog[]
+  savedViews       SavedView[]
+  importBatches    ImportBatch[]
+  resolvedIssues   DataQualityIssue[]  @relation("IssueResolver")
+  createdOpps      Opportunity[]       @relation("OpportunityCreator")
+  followUps        FollowUp[]
+  attachments      Attachment[]
+  contactInteractions ContactInteraction[]
+
+  @@index([isArchived, isActive])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Reference tables
+// ─────────────────────────────────────────────────────────────────────────────
+
+enum OperationCategory {
+  CREDITO_ESTRUTURADO
+  DIP_EXIT_FINANCING
+  NPL
+  LEGAL_CLAIM
+  LITIGATION_FINANCE
+  PRECATORIO_FEDERAL
+  PRECATORIO_ESTADUAL
+  PRECATORIO_MUNICIPAL
+  PRE_PRECATORIO
+  DIREITOS_CREDITORIOS
+  FIDC
+  ANTECIPACAO_RECEBIVEIS
+  FALENCIA_DISTRESSED
+  OUTROS
+}
+
+model OperationType {
+  id          String            @id @default(cuid())
+  name        String            @unique
+  slug        String            @unique
+  category    OperationCategory @default(OUTROS)
+  description String?
+  color       String?
+  sortOrder   Int               @default(100)
+  isActive    Boolean           @default(true)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  opportunities Opportunity[]
+  mappings      OperationTypeMapping[]
+}
+
+/// De/para between raw spreadsheet spellings and normalized OperationType. Editable in Admin.
+model OperationTypeMapping {
+  id              String   @id @default(cuid())
+  rawValue        String   @unique
+  normalizedKey   String
+  operationTypeId String?
+  operationType   OperationType? @relation(fields: [operationTypeId], references: [id], onDelete: SetNull)
+  confidence      Float    @default(1)
+  source          String   @default("rule") // rule | sheet2 | manual
+  occurrences     Int      @default(0)
+  needsReview     Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([normalizedKey])
+}
+
+/// Structured pipeline status. `outcome` separates operational stage from final result.
+enum Outcome {
+  OPEN
+  WON
+  LOST
+  ON_HOLD
+  INACTIVE
+  UNKNOWN
+}
+
+enum StatusGroup {
+  ACTIVE
+  ON_HOLD
+  CONCLUDED
+  CLOSED
+  LEGACY
+}
+
+model OpportunityStatus {
+  id          String      @id @default(cuid())
+  key         String      @unique // NEW, TRIAGE, ANALYSIS, ...
+  name        String
+  group       StatusGroup
+  outcome     Outcome
+  sortOrder   Int
+  color       String?
+  isLegacy    Boolean     @default(false)
+  isActive    Boolean     @default(true)
+
+  opportunities Opportunity[]
+}
+
+enum CompanyCategory {
+  BANCO
+  ASSET
+  CONSULTORIA
+  BOUTIQUE
+  BROKER
+  ESCRITORIO_ADVOCACIA
+  EMPRESARIO_EXECUTIVO
+  ADVISOR
+  ORIGINACAO_PROPRIA
+  FUNDO
+  OUTROS
+}
+
+enum EntryChannel {
+  EMAIL
+  WHATSAPP
+  LIGACAO
+  REUNIAO
+  INDICACAO
+  ORIGINACAO_PROPRIA
+  OUTRO
+}
+
+enum Relationship {
+  ESTRATEGICO
+  ATIVO
+  ESPORADICO
+  FRIO
+  NOVO
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Origination: companies and contacts
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Company {
+  id              String          @id @default(cuid())
+  name            String
+  shortName       String?
+  normalizedName  String          @unique
+  category        CompanyCategory @default(OUTROS)
+  categoryRaw     String?
+  website         String?
+  address         String?
+  notes           String?
+  relationship    Relationship    @default(NOVO)
+  lastInteractionAt DateTime?
+  /// Set during migration when the company was derived from a free-text contact cell.
+  migrationConfidence Float?
+  migrationNotes  String?
+  needsReview     Boolean         @default(false)
+  isActive        Boolean         @default(true)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  contacts      Contact[]
+  originations  OpportunityOriginator[]
+  aliases       CompanyAlias[]
+  interactions  ContactInteraction[]
+
+  @@index([category])
+  @@index([name])
+}
+
+/// Alternative spellings for a company found in the spreadsheet (A&M, Alvarez& Marsal, ...).
+model CompanyAlias {
+  id        String  @id @default(cuid())
+  alias     String  @unique
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model Contact {
+  id              String          @id @default(cuid())
+  firstName       String
+  lastName        String?
+  fullName        String
+  normalizedName  String
+  companyId       String?
+  company         Company?        @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  title           String?
+  email           String?
+  phone           String?
+  whatsapp        String?
+  linkedin        String?
+  category        CompanyCategory?
+  notes           String?
+  relationship    Relationship    @default(NOVO)
+  lastContactAt   DateTime?
+  nextFollowUpAt  DateTime?
+  migrationConfidence Float?
+  migrationNotes  String?
+  needsReview     Boolean         @default(false)
+  isActive        Boolean         @default(true)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  originations OpportunityOriginator[]
+  interactions ContactInteraction[]
+
+  @@unique([normalizedName, companyId])
+  @@index([companyId])
+  @@index([fullName])
+  @@index([nextFollowUpAt])
+}
+
+enum InteractionType {
+  EMAIL
+  WHATSAPP
+  LIGACAO
+  REUNIAO
+  NOTA
+  OUTRO
+}
+
+/// CRM interactions with an originator that are not necessarily tied to an opportunity.
+model ContactInteraction {
+  id          String          @id @default(cuid())
+  contactId   String?
+  contact     Contact?        @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  companyId   String?
+  company     Company?        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  type        InteractionType @default(NOTA)
+  summary     String
+  occurredAt  DateTime        @default(now())
+  userId      String?
+  user        User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt   DateTime        @default(now())
+
+  @@index([contactId, occurredAt])
+  @@index([companyId, occurredAt])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Opportunities
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Opportunity {
+  id                String   @id @default(cuid())
+  /// Sequential legacy number from the spreadsheet (# column). Null for new records.
+  legacyId          Int?     @unique
+  name              String
+  nameRaw           String?
+  economicGroup     String?
+  description       String?
+  sector            String?
+
+  operationTypeId   String?
+  operationType     OperationType? @relation(fields: [operationTypeId], references: [id], onDelete: SetNull)
+  operationTypeRaw  String?
+
+  statusId          String
+  status            OpportunityStatus @relation(fields: [statusId], references: [id])
+  statusRaw         String?          // Decisão column
+  legacyStatusText  String?          // Status da Operação column (free text history)
+  legacyFeedback    String?          // Feedback column
+
+  entryDate         DateTime?
+  entryDateRaw      String?
+  entryYear         Int?
+  entryYearRaw      String?
+  exitDate          DateTime?
+  exitDateRaw       String?
+
+  amount            Decimal? @db.Decimal(18, 4) // R$ mm
+  amountRaw         String?
+  currency          String   @default("BRL")
+
+  entryChannel      EntryChannel?
+  emailSubject      String?
+  emailSender       String?
+  emailDate         DateTime?
+  whatsappContact   String?
+  whatsappNumber    String?
+  whatsappSummary   String?
+  firstContactAt    DateTime?
+
+  nextAction        String?
+  nextFollowUpAt    DateTime?
+  lastActivityAt    DateTime?
+  closedAt          DateTime?
+  closeReason       String?
+
+  /// Preserved original responsible-person cell ("Christopher/Antonio").
+  assigneesRaw      String?
+  /// Preserved original contact cell ("João Pedro Santos (A&M)").
+  originatorRaw     String?
+  originatorTypeRaw String?
+  /// Normalized originator category (from the originating company, or from the legacy "Tipo de Contato" column).
+  originatorCategory CompanyCategory?
+
+  needsReview       Boolean  @default(false)
+  isDeleted         Boolean  @default(false)
+
+  createdById       String?
+  createdBy         User?    @relation("OpportunityCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  assignees     OpportunityAssignee[]
+  originators   OpportunityOriginator[]
+  activities    Activity[]
+  notes         Note[]
+  followUps     FollowUp[]
+  attachments   Attachment[]
+  auditLogs     AuditLog[]
+  importRows    ImportRow[]
+  issues        DataQualityIssue[]
+
+  @@index([entryDate])
+  @@index([entryYear])
+  @@index([statusId])
+  @@index([operationTypeId])
+  @@index([nextFollowUpAt])
+  @@index([updatedAt])
+  @@index([entryChannel])
+  @@index([name])
+  @@index([isDeleted, statusId])
+  @@index([originatorCategory])
+}
+
+model OpportunityAssignee {
+  opportunityId String
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isPrimary     Boolean     @default(false)
+  assignedAt    DateTime    @default(now())
+
+  @@id([opportunityId, userId])
+  @@index([userId])
+}
+
+enum OriginatorRole {
+  PRIMARY
+  SECONDARY
+}
+
+model OpportunityOriginator {
+  id            String         @id @default(cuid())
+  opportunityId String
+  opportunity   Opportunity    @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  companyId     String?
+  company       Company?       @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  contactId     String?
+  contact       Contact?       @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  role          OriginatorRole @default(PRIMARY)
+  rawText       String?
+  confidence    Float?
+  migrationNotes String?
+  needsReview   Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+
+  @@unique([opportunityId, role])
+  @@index([companyId])
+  @@index([contactId])
+}
+
+enum ActivityType {
+  CREATED
+  NOTE
+  EMAIL
+  WHATSAPP
+  MEETING
+  CALL
+  INFO_RECEIVED
+  PROPOSAL_SENT
+  STATUS_CHANGED
+  ASSIGNEE_CHANGED
+  REACTIVATED
+  CLOSED
+  FOLLOW_UP
+  LEGACY_STATUS
+  LEGACY_FEEDBACK
+  MEETING_SNAPSHOT
+  IMPORTED
+}
+
+model Activity {
+  id            String       @id @default(cuid())
+  opportunityId String
+  opportunity   Opportunity  @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  type          ActivityType
+  title         String?
+  body          String?
+  occurredAt    DateTime     @default(now())
+  /// True for activities derived from the spreadsheet history.
+  isLegacy      Boolean      @default(false)
+  sourceSheet   String?
+  sourceRow     Int?
+  metadata      Json?
+  userId        String?
+  user          User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt     DateTime     @default(now())
+
+  @@index([opportunityId, occurredAt])
+  @@index([type])
+}
+
+model Note {
+  id            String      @id @default(cuid())
+  opportunityId String
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  body          String
+  userId        String?
+  user          User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([opportunityId, createdAt])
+}
+
+model FollowUp {
+  id            String      @id @default(cuid())
+  opportunityId String
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  dueAt         DateTime
+  action        String
+  completedAt   DateTime?
+  userId        String?
+  user          User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt     DateTime    @default(now())
+
+  @@index([dueAt, completedAt])
+  @@index([opportunityId])
+}
+
+enum AttachmentKind {
+  TEASER
+  MODEL
+  PRESENTATION
+  LEGAL
+  PROPOSAL
+  NDA
+  OTHER
+}
+
+model Attachment {
+  id            String         @id @default(cuid())
+  opportunityId String
+  opportunity   Opportunity    @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  kind          AttachmentKind @default(OTHER)
+  fileName      String
+  storageKey    String?
+  url           String?
+  mimeType      String?
+  sizeBytes     Int?
+  userId        String?
+  user          User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt     DateTime       @default(now())
+
+  @@index([opportunityId])
+}
+
+model SavedView {
+  id        String   @id @default(cuid())
+  name      String
+  page      String   // pipeline | opportunities | on-hold | originators | reports | dashboard
+  filters   Json
+  isShared  Boolean  @default(false)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, page])
+}
+
+model AuditLog {
+  id            String       @id @default(cuid())
+  entity        String       // Opportunity | Company | Contact | User | OperationTypeMapping
+  entityId      String
+  opportunityId String?
+  opportunity   Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  action        String       // create | update | delete | reactivate | close | import
+  field         String?
+  oldValue      String?
+  newValue      String?
+  userId        String?
+  user          User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt     DateTime     @default(now())
+
+  @@index([entity, entityId])
+  @@index([opportunityId, createdAt])
+  @@index([createdAt])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Import / data quality
+// ─────────────────────────────────────────────────────────────────────────────
+
+model ImportBatch {
+  id            String   @id @default(cuid())
+  sourceFile    String
+  fileHash      String?
+  startedAt     DateTime @default(now())
+  finishedAt    DateTime?
+  status        String   @default("running") // running | success | failed
+  summary       Json?
+  userId        String?
+  user          User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  rows ImportRow[]
+}
+
+/// raw_import_data: one row per spreadsheet row, exact original values in rawData.
+model ImportRow {
+  id            String       @id @default(cuid())
+  batchId       String
+  batch         ImportBatch  @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  sourceWorkbook String
+  sheet         String
+  sourceRow     Int
+  legacyId      Int?
+  rawData       Json
+  normalized    Json?
+  opportunityId String?
+  opportunity   Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: SetNull)
+  status        String       @default("imported") // imported | updated | skipped | duplicate | error
+  notes         String?
+  createdAt     DateTime     @default(now())
+
+  @@unique([sourceWorkbook, sheet, sourceRow])
+  @@index([opportunityId])
+  @@index([legacyId])
+}
+
+enum IssueSeverity {
+  INFO
+  WARNING
+  ERROR
+}
+
+model DataQualityIssue {
+  id            String        @id @default(cuid())
+  code          String        // MISSING_NAME | MISSING_DATE | INVALID_YEAR | ...
+  severity      IssueSeverity @default(WARNING)
+  entity        String        // Opportunity | Company | Contact
+  entityId      String
+  opportunityId String?
+  opportunity   Opportunity?  @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  message       String
+  details       Json?
+  resolved      Boolean       @default(false)
+  resolvedAt    DateTime?
+  resolvedById  String?
+  resolvedBy    User?         @relation("IssueResolver", fields: [resolvedById], references: [id], onDelete: SetNull)
+  resolutionNote String?
+  createdAt     DateTime      @default(now())
+
+  @@unique([code, entity, entityId])
+  @@index([code, resolved])
+  @@index([opportunityId])
+}

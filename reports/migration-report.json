@@ -1,0 +1,1870 @@
+{
+  "batchId": "cmtwd9vzy000z7do3fady4er6",
+  "fileName": "Acompanhamento do Pipe_20260817.xlsx",
+  "fileHash": "8ad4cfe48c0502fb612cccbac4dba13b9b5f4832da9d001753be28ba78aec917",
+  "sheets": [
+    "Sheet4",
+    "Pipe",
+    "Originadores",
+    "Analise Originação 2025",
+    "Reestruturação",
+    "Vertical_1812",
+    "Vertical_1610",
+    "Vertical_2509",
+    "Vertical_2108",
+    "Reunião Vertical_1707",
+    "Reuniao Vertical_1505",
+    "Originação",
+    "Output",
+    "Reuniao Vertical_old",
+    "Sheet2",
+    "Sheet1"
+  ],
+  "pipeRows": 903,
+  "created": 903,
+  "updated": 0,
+  "unchanged": 0,
+  "errors": 0,
+  "companiesCreated": 167,
+  "contactsCreated": 190,
+  "activitiesCreated": 4105,
+  "enrichment": [
+    {
+      "sheet": "Analise Originação 2025",
+      "rows": 372,
+      "matched": 366,
+      "unmatched": 6,
+      "applied": 6
+    },
+    {
+      "sheet": "Originação",
+      "rows": 257,
+      "matched": 236,
+      "unmatched": 21,
+      "applied": 15
+    },
+    {
+      "sheet": "Output",
+      "rows": 67,
+      "matched": 66,
+      "unmatched": 1,
+      "applied": 56
+    }
+  ],
+  "meetings": [
+    {
+      "sheet": "Vertical_1812",
+      "rows": 72,
+      "matched": 68,
+      "unmatched": 4
+    },
+    {
+      "sheet": "Vertical_1610",
+      "rows": 60,
+      "matched": 55,
+      "unmatched": 5
+    },
+    {
+      "sheet": "Vertical_2509",
+      "rows": 125,
+      "matched": 122,
+      "unmatched": 3
+    },
+    {
+      "sheet": "Vertical_2108",
+      "rows": 105,
+      "matched": 104,
+      "unmatched": 1
+    },
+    {
+      "sheet": "Reunião Vertical_1707",
+      "rows": 92,
+      "matched": 88,
+      "unmatched": 4
+    },
+    {
+      "sheet": "Reuniao Vertical_1505",
+      "rows": 63,
+      "matched": 49,
+      "unmatched": 14
+    },
+    {
+      "sheet": "Reuniao Vertical_old",
+      "rows": 61,
+      "matched": 45,
+      "unmatched": 16
+    }
+  ],
+  "issuesByCode": {
+    "TYPE_SPHERE_INFERRED": 22,
+    "COMPANY_UNIDENTIFIED": 288,
+    "MISSING_DATE": 19,
+    "INVALID_YEAR": 18,
+    "ORIGINATOR_UNCLASSIFIED": 68,
+    "TYPE_MISSING": 14,
+    "TYPE_UNNORMALIZED": 29,
+    "MISSING_NAME": 33,
+    "NOT_AN_OPPORTUNITY": 7,
+    "ORIGINATOR_MISSING": 36,
+    "ASSIGNEE_UNMAPPED": 2,
+    "AMOUNT_NOT_NUMERIC": 3,
+    "EXIT_BEFORE_ENTRY": 10,
+    "STATUS_UNNORMALIZED": 2,
+    "ORIGINATOR_CATEGORY_UNMAPPED": 33,
+    "POSSIBLE_DUPLICATE": 85
+  },
+  "issuesTotal": 670,
+  "possibleDuplicates": [
+    {
+      "name": "Elisa Agro",
+      "legacyIds": [
+        32,
+        281,
+        671
+      ]
+    },
+    {
+      "name": "Aspometron",
+      "legacyIds": [
+        44,
+        117,
+        287
+      ]
+    },
+    {
+      "name": "OI",
+      "legacyIds": [
+        83,
+        234,
+        374
+      ]
+    },
+    {
+      "name": "IRGOVEL",
+      "legacyIds": [
+        203,
+        217
+      ]
+    },
+    {
+      "name": "Brandili",
+      "legacyIds": [
+        90,
+        414
+      ]
+    },
+    {
+      "name": "Casa Bahia",
+      "legacyIds": [
+        95,
+        98
+      ]
+    },
+    {
+      "name": "Estre Ambiental",
+      "legacyIds": [
+        97,
+        318
+      ]
+    },
+    {
+      "name": "Camargo Correa",
+      "legacyIds": [
+        103,
+        182
+      ]
+    },
+    {
+      "name": "Sequoia",
+      "legacyIds": [
+        104,
+        136
+      ]
+    },
+    {
+      "name": "Leilão do Itau",
+      "legacyIds": [
+        105,
+        119,
+        343
+      ]
+    },
+    {
+      "name": "Minter",
+      "legacyIds": [
+        123,
+        263
+      ]
+    },
+    {
+      "name": "São Paulo",
+      "legacyIds": [
+        125,
+        290
+      ]
+    },
+    {
+      "name": "Precatório",
+      "legacyIds": [
+        157,
+        168
+      ]
+    },
+    {
+      "name": "Precatorios Estaduais e Municipais",
+      "legacyIds": [
+        204,
+        779
+      ]
+    },
+    {
+      "name": "Bunge",
+      "legacyIds": [
+        222,
+        527
+      ]
+    },
+    {
+      "name": "Cocelpa",
+      "legacyIds": [
+        230,
+        555
+      ]
+    },
+    {
+      "name": "Casa de Saúde Dr. Aragão Villar",
+      "legacyIds": [
+        233,
+        359
+      ]
+    },
+    {
+      "name": "Allonda",
+      "legacyIds": [
+        246,
+        449,
+        673
+      ]
+    },
+    {
+      "name": "Allievo",
+      "legacyIds": [
+        273,
+        330
+      ]
+    },
+    {
+      "name": "Sencinet",
+      "legacyIds": [
+        319,
+        614
+      ]
+    },
+    {
+      "name": "Construtora Itau x SANEPAR",
+      "legacyIds": [
+        336,
+        439
+      ]
+    },
+    {
+      "name": "Casas Bahia",
+      "legacyIds": [
+        339,
+        617
+      ]
+    },
+    {
+      "name": "Grupo Monte Alegre",
+      "legacyIds": [
+        350,
+        639
+      ]
+    },
+    {
+      "name": "Patense",
+      "legacyIds": [
+        356,
+        642
+      ]
+    },
+    {
+      "name": "Precatório Fortaleza",
+      "legacyIds": [
+        381,
+        625
+      ]
+    },
+    {
+      "name": "Precatório Paraná",
+      "legacyIds": [
+        387,
+        896
+      ]
+    },
+    {
+      "name": "Packem",
+      "legacyIds": [
+        418,
+        685
+      ]
+    },
+    {
+      "name": "Precatório de Alagoas",
+      "legacyIds": [
+        436,
+        814
+      ]
+    },
+    {
+      "name": "Casal x Fazenda Nacional",
+      "legacyIds": [
+        446,
+        523
+      ]
+    },
+    {
+      "name": "Eletrodata",
+      "legacyIds": [
+        453,
+        720
+      ]
+    },
+    {
+      "name": "Cara Preta",
+      "legacyIds": [
+        491,
+        568
+      ]
+    },
+    {
+      "name": "CTR Itaboraí x Itaboraí",
+      "legacyIds": [
+        513,
+        514
+      ]
+    },
+    {
+      "name": "Tomé Carlos x  Instituto Chico Mendes (ICMBio)",
+      "legacyIds": [
+        571,
+        794
+      ]
+    },
+    {
+      "name": "Zemax",
+      "legacyIds": [
+        627,
+        782
+      ]
+    },
+    {
+      "name": "Minauro x SP",
+      "legacyIds": [
+        692,
+        842
+      ]
+    },
+    {
+      "name": "Cunha vs. Gafisa",
+      "legacyIds": [
+        697,
+        823
+      ]
+    },
+    {
+      "name": "Crédito Pis Cofins",
+      "legacyIds": [
+        714,
+        716
+      ]
+    },
+    {
+      "name": "Telemont",
+      "legacyIds": [
+        734,
+        812
+      ]
+    },
+    {
+      "name": "Usina João de Deus x União (Tese do IAA)",
+      "legacyIds": [
+        763,
+        813
+      ]
+    },
+    {
+      "name": "Construturor QGI x Petrobras",
+      "legacyIds": [
+        894,
+        895
+      ]
+    }
+  ],
+  "needsReviewOpportunities": 139,
+  "unmatchedAux": [
+    {
+      "sheet": "Analise Originação 2025",
+      "sourceRow": 19,
+      "nome": null,
+      "data": "2025-01-31"
+    },
+    {
+      "sheet": "Analise Originação 2025",
+      "sourceRow": 24,
+      "nome": null,
+      "data": "2025-01-31"
+    },
+    {
+      "sheet": "Analise Originação 2025",
+      "sourceRow": 43,
+      "nome": null,
+      "data": "2025-01-31"
+    },
+    {
+      "sheet": "Analise Originação 2025",
+      "sourceRow": 44,
+      "nome": null,
+      "data": "2025-01-31"
+    },
+    {
+      "sheet": "Analise Originação 2025",
+      "sourceRow": 88,
+      "nome": null,
+      "data": "2025-03-17"
+    },
+    {
+      "sheet": "Analise Originação 2025",
+      "sourceRow": 256,
+      "nome": null,
+      "data": "2025-08-12"
+    },
+    {
+      "sheet": "Originação",
+      "sourceRow": 10,
+      "nome": null,
+      "data": "2024-08-21"
+    },
+    {
+      "sheet": "Originação",
+      "sourceRow": 19,
+      "nome": null,
+      "data": "2024-11-18"
+    },
+    {
+      "sheet": "Originação",
+      "sourceRow": 24,
+      "nome": null,
+      "data": "2024-12-10"
+    },
+    {
+      "sheet": "Originação",
+      "sourceRow": 31,
+      "nome": null,
+      "data": "2024-12-13"
+    },
+    {
+      "sheet": "Originação",
+      "sourceRow": 39,
+      "nome": null,
+      "data": "2024-07-30"
+    },
+    {
+      "sheet": "Originação",
+      "sourceRow": 51,
+      "nome": null,
+      "data": "2024-08-20"
+    },
+    {
+      "sheet": "Originação",
+      "sourceRow": 54,
+      "nome": null,
+      "data": "2024-04-19"
+    },
+    {
+      "sheet": "Originação",
+      "sourceRow": 126,
+      "nome": null,
+      "data": "2024-10-28"
+    },
+    {
+      "sheet": "Originação",
+      "sourceRow": 134,
+      "nome": "OI",
+      "data": null
+    },
+    {
+      "sheet": "Originação",
+      "sourceRow": 142,
+      "nome": "Petrobras",
+      "data": "2024-03-15"
+    },
+    {
+      "sheet": "Originação",
+      "sourceRow": 151,
+      "nome": null,
+      "data": "2024-06-06"
+    },
+    {
+      "sheet": "Originação",
+      "sourceRow": 157,
+      "nome": null,
+      "data": "2024-12-13"
+    },
+    {
+      "sheet": "Originação",
+      "sourceRow": 158,
+      "nome": null,
+      "data": "2024-08-02"
+    },
+    {
+      "sheet": "Originação",
+      "sourceRow": 192,
+      "nome": null,
+      "data": "2024-08-20"
+    },
+    {
+      "sheet": "Originação",
+      "sourceRow": 201,
+      "nome": null,
+      "data": "2024-10-10"
+    },
+    {
+      "sheet": "Originação",
+      "sourceRow": 212,
+      "nome": "IRGOVEL",
+      "data": null
+    },
+    {
+      "sheet": "Originação",
+      "sourceRow": 227,
+      "nome": null,
+      "data": "2024-03-15"
+    },
+    {
+      "sheet": "Originação",
+      "sourceRow": 232,
+      "nome": null,
+      "data": "2024-08-30"
+    },
+    {
+      "sheet": "Originação",
+      "sourceRow": 240,
+      "nome": null,
+      "data": "2024-08-23"
+    },
+    {
+      "sheet": "Originação",
+      "sourceRow": 242,
+      "nome": null,
+      "data": "2024-08-30"
+    },
+    {
+      "sheet": "Originação",
+      "sourceRow": 261,
+      "nome": null,
+      "data": "2024-10-17"
+    },
+    {
+      "sheet": "Output",
+      "sourceRow": 37,
+      "nome": "Nome",
+      "data": null
+    }
+  ],
+  "byYear": {
+    "2024": 245,
+    "2025": 372,
+    "2026": 267,
+    "sem ano": 19
+  },
+  "byStatus": {
+    "DECLINED": 736,
+    "ON_HOLD": 100,
+    "CONCLUDED": 27,
+    "LEGACY_UNCLASSIFIED": 2,
+    "ANALYSIS": 38
+  },
+  "byType": {
+    "precatorio-estadual": 87,
+    "precatorio-nao-identificado": 21,
+    "credito-estruturado": 231,
+    "dip-exit-financing": 67,
+    "precatorio-federal": 54,
+    "titulos-de-credito": 10,
+    "npl": 67,
+    "pre-precatorio-federal": 45,
+    "outros": 29,
+    "legal-claim": 156,
+    "nao-e-oportunidade": 7,
+    "litigation-finance": 10,
+    "precatorio-municipal": 50,
+    "direitos-creditorios": 24,
+    "pre-precatorio-municipal": 6,
+    "pre-precatorio": 8,
+    "fidc": 7,
+    "falencia-distressed": 10,
+    "antecipacao-recebiveis": 6,
+    "pre-precatorio-estadual": 8
+  },
+  "typeMappings": [
+    {
+      "raw": "Crédito Estruturado",
+      "slug": "credito-estruturado",
+      "confidence": 1,
+      "needsReview": false,
+      "occurrences": 160
+    },
+    {
+      "raw": "Legal Claim",
+      "slug": "legal-claim",
+      "confidence": 1,
+      "needsReview": false,
+      "occurrences": 112
+    },
+    {
+      "raw": "NPL",
+      "slug": "npl",
+      "confidence": 1,
+      "needsReview": false,
+      "occurrences": 52
+    },
+    {
+      "raw": "Precatório Estadual",
+      "slug": "precatorio-estadual",
+      "confidence": 1,
+      "needsReview": false,
+      "occurrences": 51
+    },
+    {
+      "raw": "DIP",
+      "slug": "dip-exit-financing",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 50
+    },
+    {
+      "raw": "Crédito",
+      "slug": "credito-estruturado",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 43
+    },
+    {
+      "raw": "Precatório Federal",
+      "slug": "precatorio-federal",
+      "confidence": 1,
+      "needsReview": false,
+      "occurrences": 33
+    },
+    {
+      "raw": "Precatório Municipal",
+      "slug": "precatorio-municipal",
+      "confidence": 1,
+      "needsReview": false,
+      "occurrences": 33
+    },
+    {
+      "raw": "Pré Precatório Federal",
+      "slug": "pre-precatorio-federal",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 29
+    },
+    {
+      "raw": "Precatórios",
+      "slug": "precatorio-nao-identificado",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 14
+    },
+    {
+      "raw": "Ação Judicial",
+      "slug": "legal-claim",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 12
+    },
+    {
+      "raw": "Precatório",
+      "slug": "precatorio-nao-identificado",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 11
+    },
+    {
+      "raw": "Precatorio Municipal",
+      "slug": "precatorio-municipal",
+      "confidence": 1,
+      "needsReview": false,
+      "occurrences": 9
+    },
+    {
+      "raw": "Litigation Finance",
+      "slug": "litigation-finance",
+      "confidence": 1,
+      "needsReview": false,
+      "occurrences": 9
+    },
+    {
+      "raw": "Legal Claims",
+      "slug": "legal-claim",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 9
+    },
+    {
+      "raw": "Precatorio Estadual",
+      "slug": "precatorio-estadual",
+      "confidence": 1,
+      "needsReview": false,
+      "occurrences": 8
+    },
+    {
+      "raw": "Direito Creditórios",
+      "slug": "direitos-creditorios",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 8
+    },
+    {
+      "raw": "Crédito para Operação",
+      "slug": "credito-estruturado",
+      "confidence": 0.8,
+      "needsReview": false,
+      "occurrences": 7
+    },
+    {
+      "raw": "Precatorio Federal",
+      "slug": "precatorio-federal",
+      "confidence": 1,
+      "needsReview": false,
+      "occurrences": 7
+    },
+    {
+      "raw": "Falência",
+      "slug": "falencia-distressed",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 7
+    },
+    {
+      "raw": "DIP para RJ",
+      "slug": "dip-exit-financing",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 5
+    },
+    {
+      "raw": "Credito",
+      "slug": "credito-estruturado",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 5
+    },
+    {
+      "raw": "Antecipação de Recebíveis",
+      "slug": "antecipacao-recebiveis",
+      "confidence": 1,
+      "needsReview": false,
+      "occurrences": 5
+    },
+    {
+      "raw": "Debenture",
+      "slug": "titulos-de-credito",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 4
+    },
+    {
+      "raw": "Direitos Creditórios",
+      "slug": "direitos-creditorios",
+      "confidence": 1,
+      "needsReview": false,
+      "occurrences": 4
+    },
+    {
+      "raw": "Precatorios",
+      "slug": "precatorio-nao-identificado",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 4
+    },
+    {
+      "raw": "Pré precatório",
+      "slug": "pre-precatorio",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 4
+    },
+    {
+      "raw": "Pré Precatorio",
+      "slug": "pre-precatorio",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 4
+    },
+    {
+      "raw": "Pre precatorio",
+      "slug": "pre-precatorio",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 4
+    },
+    {
+      "raw": "Precatorio federal",
+      "slug": "precatorio-federal",
+      "confidence": 1,
+      "needsReview": false,
+      "occurrences": 4
+    },
+    {
+      "raw": "Pré Precatório Municipal",
+      "slug": "pre-precatorio-municipal",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 4
+    },
+    {
+      "raw": "Leilão",
+      "slug": "direitos-creditorios",
+      "confidence": 0.6,
+      "needsReview": true,
+      "occurrences": 3
+    },
+    {
+      "raw": "Crédito para RJ",
+      "slug": "dip-exit-financing",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 3
+    },
+    {
+      "raw": "Precatorio",
+      "slug": "precatorio-nao-identificado",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 3
+    },
+    {
+      "raw": "Legal claim",
+      "slug": "legal-claim",
+      "confidence": 1,
+      "needsReview": false,
+      "occurrences": 3
+    },
+    {
+      "raw": "Credito para RJ",
+      "slug": "dip-exit-financing",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 3
+    },
+    {
+      "raw": "Pré-precatório Federal",
+      "slug": "pre-precatorio-federal",
+      "confidence": 1,
+      "needsReview": false,
+      "occurrences": 3
+    },
+    {
+      "raw": "FIDC",
+      "slug": "fidc",
+      "confidence": 1,
+      "needsReview": false,
+      "occurrences": 3
+    },
+    {
+      "raw": "Pré precatório Estadual",
+      "slug": "pre-precatorio-estadual",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 3
+    },
+    {
+      "raw": "CRA",
+      "slug": "titulos-de-credito",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 3
+    },
+    {
+      "raw": "Claims",
+      "slug": "legal-claim",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 2
+    },
+    {
+      "raw": "Compra de NPL",
+      "slug": "npl",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 2
+    },
+    {
+      "raw": "Pre precatório Federal",
+      "slug": "pre-precatorio-federal",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 2
+    },
+    {
+      "raw": "Oportunidade de Crédito estressado",
+      "slug": "credito-estruturado",
+      "confidence": 0.8,
+      "needsReview": false,
+      "occurrences": 2
+    },
+    {
+      "raw": "Crédito RJ",
+      "slug": "dip-exit-financing",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 2
+    },
+    {
+      "raw": "Capital de Giro",
+      "slug": "credito-estruturado",
+      "confidence": 0.8,
+      "needsReview": false,
+      "occurrences": 2
+    },
+    {
+      "raw": "Tunepe",
+      "slug": "legal-claim",
+      "confidence": 0.6,
+      "needsReview": true,
+      "occurrences": 2
+    },
+    {
+      "raw": "Precatorio TO",
+      "slug": "precatorio-estadual",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 2
+    },
+    {
+      "raw": "Precatorio do Rio de Janeiro",
+      "slug": "precatorio-estadual",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 2
+    },
+    {
+      "raw": "Pre Precatorio Federal",
+      "slug": "pre-precatorio-federal",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 2
+    },
+    {
+      "raw": "Claim",
+      "slug": "legal-claim",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 2
+    },
+    {
+      "raw": "Carteira de Crédito",
+      "slug": "npl",
+      "confidence": 0.75,
+      "needsReview": false,
+      "occurrences": 2
+    },
+    {
+      "raw": "Precatórios Estaduais",
+      "slug": "precatorio-estadual",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 2
+    },
+    {
+      "raw": "Leilao Single Names ITAÚ",
+      "slug": "npl",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Honorário Advocatício Data Traffic",
+      "slug": "legal-claim",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Ação Judicial x Transnordestina",
+      "slug": "legal-claim",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Crédito para empresa em distress",
+      "slug": "credito-estruturado",
+      "confidence": 0.8,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Gazeta Mercantil",
+      "slug": "outros",
+      "confidence": 0.2,
+      "needsReview": true,
+      "occurrences": 1
+    },
+    {
+      "raw": "Honorários Advocatícios",
+      "slug": "legal-claim",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Crédito para Empresa",
+      "slug": "credito-estruturado",
+      "confidence": 0.8,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Credito tributario ICMS",
+      "slug": "direitos-creditorios",
+      "confidence": 0.8,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Compra de créditos de RJ",
+      "slug": "dip-exit-financing",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Financiamento imobiliário",
+      "slug": "credito-estruturado",
+      "confidence": 0.7,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Precatorio estadual Goias",
+      "slug": "precatorio-estadual",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Leilao Itaú",
+      "slug": "npl",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Precatorios Municipais RJ CNO",
+      "slug": "precatorio-municipal",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Ativos para Monetização",
+      "slug": "outros",
+      "confidence": 0.5,
+      "needsReview": true,
+      "occurrences": 1
+    },
+    {
+      "raw": "Ação contra o estado do Pará",
+      "slug": "legal-claim",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Precatorio Municipal do RJ",
+      "slug": "precatorio-municipal",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Massa Falida",
+      "slug": "falencia-distressed",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Crédito para compra de participação em empresa",
+      "slug": "credito-estruturado",
+      "confidence": 0.8,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "TECHNION",
+      "slug": "outros",
+      "confidence": 0.2,
+      "needsReview": true,
+      "occurrences": 1
+    },
+    {
+      "raw": "Alongamento de Dívida",
+      "slug": "credito-estruturado",
+      "confidence": 0.8,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Precatorio Estadual RJ",
+      "slug": "precatorio-estadual",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Precatorio Estadual SP",
+      "slug": "precatorio-estadual",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Precatorio Estadual MT",
+      "slug": "precatorio-estadual",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "IAA Pre precatorio",
+      "slug": "pre-precatorio-federal",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Carteira Precatorios A&M",
+      "slug": "precatorio-nao-identificado",
+      "confidence": 0.6,
+      "needsReview": true,
+      "occurrences": 1
+    },
+    {
+      "raw": "Precatorio 3A Investimentos",
+      "slug": "precatorio-nao-identificado",
+      "confidence": 0.6,
+      "needsReview": true,
+      "occurrences": 1
+    },
+    {
+      "raw": "Credito UST",
+      "slug": "direitos-creditorios",
+      "confidence": 0.5,
+      "needsReview": true,
+      "occurrences": 1
+    },
+    {
+      "raw": "Angatu",
+      "slug": "outros",
+      "confidence": 0.2,
+      "needsReview": true,
+      "occurrences": 1
+    },
+    {
+      "raw": "Precatorio TUNEP",
+      "slug": "precatorio-federal",
+      "confidence": 0.7,
+      "needsReview": true,
+      "occurrences": 1
+    },
+    {
+      "raw": "Marcelo Leonel",
+      "slug": "outros",
+      "confidence": 0.2,
+      "needsReview": true,
+      "occurrences": 1
+    },
+    {
+      "raw": "FIDCs",
+      "slug": "fidc",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Sucumbência de Precatorio",
+      "slug": "legal-claim",
+      "confidence": 0.7,
+      "needsReview": true,
+      "occurrences": 1
+    },
+    {
+      "raw": "Pre precatório",
+      "slug": "pre-precatorio",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Precatorio do Estado do PR",
+      "slug": "precatorio-estadual",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Precatorio FA",
+      "slug": "precatorio-nao-identificado",
+      "confidence": 0.4,
+      "needsReview": true,
+      "occurrences": 1
+    },
+    {
+      "raw": "Antecipaçao de Metodista",
+      "slug": "antecipacao-recebiveis",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Aquisição de carteira de NPL",
+      "slug": "npl",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Venda de UPI",
+      "slug": "falencia-distressed",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Precatório Federal TRF1",
+      "slug": "precatorio-federal",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Ativos Judiciais Tributarios",
+      "slug": "legal-claim",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "FIDC Agro",
+      "slug": "fidc",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Precatório Federal Alimentar",
+      "slug": "precatorio-federal",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Compra de Crédito",
+      "slug": "direitos-creditorios",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Execução",
+      "slug": "legal-claim",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Formulário de Referência/Leme Forense",
+      "slug": "nao-e-oportunidade",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "SITE RI",
+      "slug": "nao-e-oportunidade",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Crédito Trabalhista",
+      "slug": "legal-claim",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Pré-Precatório Federal",
+      "slug": "pre-precatorio-federal",
+      "confidence": 1,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Carta",
+      "slug": "nao-e-oportunidade",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Apresentação",
+      "slug": "nao-e-oportunidade",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Direto Creditório",
+      "slug": "credito-estruturado",
+      "confidence": 0.8,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Compra de UPI",
+      "slug": "falencia-distressed",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Carteira de crédito",
+      "slug": "npl",
+      "confidence": 0.75,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Carteira de Ativos",
+      "slug": "outros",
+      "confidence": 0.5,
+      "needsReview": true,
+      "occurrences": 1
+    },
+    {
+      "raw": "Pré Precatório",
+      "slug": "pre-precatorio",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Crédito ICMS",
+      "slug": "direitos-creditorios",
+      "confidence": 0.8,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Arbitragem",
+      "slug": "legal-claim",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Precatórios Municipais",
+      "slug": "precatorio-municipal",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Ativo Fiscal",
+      "slug": "direitos-creditorios",
+      "confidence": 0.8,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Pré precatorio",
+      "slug": "pre-precatorio",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Aquisição de Empresa",
+      "slug": "outros",
+      "confidence": 0.7,
+      "needsReview": true,
+      "occurrences": 1
+    },
+    {
+      "raw": "Pré-precatório Estado",
+      "slug": "pre-precatorio-estadual",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Precatórios Federal",
+      "slug": "precatorio-federal",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Venda de ativo",
+      "slug": "outros",
+      "confidence": 0.6,
+      "needsReview": true,
+      "occurrences": 1
+    },
+    {
+      "raw": "Fiagro III",
+      "slug": "fidc",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Equity",
+      "slug": "outros",
+      "confidence": 0.7,
+      "needsReview": true,
+      "occurrences": 1
+    },
+    {
+      "raw": "Pré Precatorio Estadual",
+      "slug": "pre-precatorio-estadual",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "DIP FINANCE",
+      "slug": "dip-exit-financing",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Inventário",
+      "slug": "legal-claim",
+      "confidence": 0.6,
+      "needsReview": true,
+      "occurrences": 1
+    },
+    {
+      "raw": "Pre precatório Estadual",
+      "slug": "pre-precatorio-estadual",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Pre precatorio Municipal",
+      "slug": "pre-precatorio-municipal",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "TDA",
+      "slug": "direitos-creditorios",
+      "confidence": 0.8,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Pre precatorio Estadual",
+      "slug": "pre-precatorio-estadual",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Precatórios Federais",
+      "slug": "precatorio-federal",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Crédito para CapEx",
+      "slug": "credito-estruturado",
+      "confidence": 0.8,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "DIP/Equity para RJ",
+      "slug": "dip-exit-financing",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Crédito para Pgto do Bond",
+      "slug": "credito-estruturado",
+      "confidence": 0.8,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "CRA ou CRI",
+      "slug": "titulos-de-credito",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Compra de Carteira de Crédito",
+      "slug": "npl",
+      "confidence": 0.75,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Pré-precatório",
+      "slug": "pre-precatorio",
+      "confidence": 1,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Refinanciamento da Dívida",
+      "slug": "credito-estruturado",
+      "confidence": 0.8,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Capital Solution",
+      "slug": "credito-estruturado",
+      "confidence": 0.8,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Credito para Empresa",
+      "slug": "credito-estruturado",
+      "confidence": 0.8,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Precatório Sergipe",
+      "slug": "precatorio-estadual",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Precatorio Estado de SP",
+      "slug": "precatorio-estadual",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Precatório Tocantis",
+      "slug": "precatorio-estadual",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Precatórios Tocantis",
+      "slug": "precatorio-estadual",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Precatório DF",
+      "slug": "precatorio-estadual",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Apresentação de Special Sits",
+      "slug": "nao-e-oportunidade",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Acordo de negociação das fazendas",
+      "slug": "outros",
+      "confidence": 0.5,
+      "needsReview": true,
+      "occurrences": 1
+    },
+    {
+      "raw": "Carteira",
+      "slug": "outros",
+      "confidence": 0.4,
+      "needsReview": true,
+      "occurrences": 1
+    },
+    {
+      "raw": "Carteira de Real Estate",
+      "slug": "outros",
+      "confidence": 0.6,
+      "needsReview": true,
+      "occurrences": 1
+    },
+    {
+      "raw": "Litigation",
+      "slug": "litigation-finance",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Precatório Federal Brasilia",
+      "slug": "precatorio-federal",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Sugestão de Parceria",
+      "slug": "nao-e-oportunidade",
+      "confidence": 0.8,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Tunep",
+      "slug": "legal-claim",
+      "confidence": 0.6,
+      "needsReview": true,
+      "occurrences": 1
+    },
+    {
+      "raw": "Compra de Créditos",
+      "slug": "direitos-creditorios",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Compra de Debentures",
+      "slug": "titulos-de-credito",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "NPL do Itau",
+      "slug": "npl",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Compra de Créditos do CS",
+      "slug": "direitos-creditorios",
+      "confidence": 0.6,
+      "needsReview": true,
+      "occurrences": 1
+    },
+    {
+      "raw": "Ativos Judiciais",
+      "slug": "legal-claim",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Pre precatorio Municipal - Feira de Santana",
+      "slug": "pre-precatorio-municipal",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Carteira de recebíveis",
+      "slug": "npl",
+      "confidence": 0.75,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Precatório Paraná",
+      "slug": "precatorio-estadual",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Compra de CRI",
+      "slug": "titulos-de-credito",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Imóveis em Leilão",
+      "slug": "outros",
+      "confidence": 0.6,
+      "needsReview": true,
+      "occurrences": 1
+    },
+    {
+      "raw": "Carteira de Créditos Municipais",
+      "slug": "npl",
+      "confidence": 0.75,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Precatório Estadual de Goiás",
+      "slug": "precatorio-estadual",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Rafael Spinelli",
+      "slug": "outros",
+      "confidence": 0.2,
+      "needsReview": true,
+      "occurrences": 1
+    },
+    {
+      "raw": "Precatório de Camaçari",
+      "slug": "precatorio-municipal",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Apresentação de NPL para o Banco do Brasil",
+      "slug": "nao-e-oportunidade",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Precatório Estadual do RJ",
+      "slug": "precatorio-estadual",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Honorário Advocatício sobre Legal Claim",
+      "slug": "legal-claim",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Direitos Creditorios Federais",
+      "slug": "direitos-creditorios",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Dívida para recompra de Imovel",
+      "slug": "credito-estruturado",
+      "confidence": 0.7,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Precatorios Estadual",
+      "slug": "precatorio-estadual",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Antecipação de Acordo Trabalhista",
+      "slug": "legal-claim",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Compra de crédito na RJ",
+      "slug": "dip-exit-financing",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Venda de Carteira AGRO",
+      "slug": "npl",
+      "confidence": 0.75,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Carteira de credito",
+      "slug": "npl",
+      "confidence": 0.75,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Precatório Estadual Ceará",
+      "slug": "precatorio-estadual",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Venda de Cia de Antecipação de Preca",
+      "slug": "outros",
+      "confidence": 0.5,
+      "needsReview": true,
+      "occurrences": 1
+    },
+    {
+      "raw": "Venda de Carteira de Recebíveis Agro",
+      "slug": "npl",
+      "confidence": 0.75,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "FIDC Auto BV",
+      "slug": "fidc",
+      "confidence": 0.95,
+      "needsReview": false,
+      "occurrences": 1
+    },
+    {
+      "raw": "Precatorio estadual RJ",
+      "slug": "precatorio-estadual",
+      "confidence": 0.9,
+      "needsReview": false,
+      "occurrences": 1
+    }
+  ],
+  "assigneeTokens": {
+    "christopher": 58,
+    "mollica": 8,
+    "hugo": 23,
+    "luiza": 47,
+    "bernardo": 11,
+    "antonio": 16
+  },
+  "unmappedAssigneeTokens": {
+    "jgp fa": 1,
+    "todos": 1
+  }
+}
