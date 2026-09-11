@@ -80,20 +80,20 @@ describe("opportunity actions", () => {
     const { closeOpportunity, reactivateOpportunity } = await import("@/lib/actions/opportunities");
     const o = await prisma.opportunity.findFirstOrThrow({ where: { name: "Projeto Teste" } });
     expect((await closeOpportunity(o.id, "ON_HOLD", "Aguardando cliente")).ok).toBe(true);
-    let cur = await prisma.opportunity.findUniqueOrThrow({ where: { id: o.id }, include: { status: true } });
-    expect(cur.status.group).toBe("ON_HOLD");
+    const held = await prisma.opportunity.findUniqueOrThrow({ where: { id: o.id }, include: { status: true } });
+    expect(held.status.group).toBe("ON_HOLD");
     expect((await reactivateOpportunity(o.id, "ANALYSIS", "Cliente voltou")).ok).toBe(true);
-    cur = await prisma.opportunity.findUniqueOrThrow({ where: { id: o.id }, include: { status: true, activities: true, auditLogs: true } });
-    expect(cur.status.key).toBe("ANALYSIS");
-    const react = cur.activities.find((a) => a.type === "REACTIVATED");
+    const reactivated = await prisma.opportunity.findUniqueOrThrow({ where: { id: o.id }, include: { status: true, activities: true, auditLogs: true } });
+    expect(reactivated.status.key).toBe("ANALYSIS");
+    const react = reactivated.activities.find((a) => a.type === "REACTIVATED");
     expect(react).toBeTruthy();
     expect((react!.metadata as Record<string, unknown>).from).toBe("ON_HOLD");
     expect(react!.userId).toBe(currentUser.id);
-    expect(cur.auditLogs.some((l) => l.action === "reactivate")).toBe(true);
+    expect(reactivated.auditLogs.some((l) => l.action === "reactivate")).toBe(true);
     expect((await closeOpportunity(o.id, "DECLINED", "Sem garantia")).ok).toBe(true);
-    cur = await prisma.opportunity.findUniqueOrThrow({ where: { id: o.id }, include: { status: true } });
-    expect(cur.status.outcome).toBe("LOST");
-    expect(cur.closedAt).not.toBeNull();
+    const declined = await prisma.opportunity.findUniqueOrThrow({ where: { id: o.id }, include: { status: true } });
+    expect(declined.status.outcome).toBe("LOST");
+    expect(declined.closedAt).not.toBeNull();
   });
 
   it("updates an opportunity and logs changed fields only", async () => {
