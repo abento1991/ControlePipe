@@ -1,6 +1,6 @@
 /**
  * Applies pending Prisma migrations without the Prisma CLI (fallback for slim containers).
- * Mirrors `prisma migrate deploy`: reads prisma/migrations/*/migration.sql, skips the ones already
+ * Mirrors `prisma migrate deploy`: reads each migration.sql under prisma/migrations, skips the ones already
  * recorded in _prisma_migrations, applies the rest in order and records them.
  */
 import { PrismaClient } from "@prisma/client";
