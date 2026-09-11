@@ -5,8 +5,9 @@ LOG=/app/bootstrap.log
 : > "$LOG"
 log() { echo "[leto] $*" | tee -a "$LOG"; }
 
-export PORT="${PORT:-3000}"
-export HOSTNAME=0.0.0.0
+# The public domain targets port 3000; listen there on IPv4+IPv6 (Railway proxies over IPv6).
+export PORT=3000
+export HOSTNAME="::"
 export AUTH_TRUST_HOST="${AUTH_TRUST_HOST:-true}"
 if [ -z "$AUTH_URL" ] && [ -n "$RAILWAY_PUBLIC_DOMAIN" ]; then export AUTH_URL="https://$RAILWAY_PUBLIC_DOMAIN"; fi
 if [ -z "$AUTH_URL" ] && [ -n "$RENDER_EXTERNAL_URL" ]; then export AUTH_URL="$RENDER_EXTERNAL_URL"; fi
