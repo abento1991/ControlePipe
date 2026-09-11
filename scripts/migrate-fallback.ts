@@ -28,16 +28,26 @@ async function main() {
       logs TEXT, rolled_back_at TIMESTAMPTZ, started_at TIMESTAMPTZ NOT NULL DEFAULT now(), applied_steps_count INTEGER NOT NULL DEFAULT 0)`);
     let applied = new Set((await prisma.$queryRawUnsafe<{ migration_name: string }[]>(`SELECT migration_name FROM "_prisma_migrations" WHERE finished_at IS NOT NULL`)).map((r) => r.migration_name));
     const sentinel = await prisma.$queryRawUnsafe<{ exists: boolean }[]>(`SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = $1) AS exists`, SENTINEL_TABLE);
-    if (applied.size > 0 && !sentinel[0]?.exists) {
-      console.log(`[migrate] recorded migrations found but table "${SENTINEL_TABLE}" is missing — repairing (re-applying all migrations)`);
+    const names = readdirSync(dir).filter((n) => existsSync(join(dir, n, "migration.sql"))).sort();
+    const sqlByName = new Map(names.map((name) => [name, readFileSync(join(dir, name, "migration.sql"), "utf8")] as const));
+    const migrationTables = [...sqlByName.values()].flatMap((sql) => [...sql.matchAll(/CREATE TABLE "([^"]+)"/g)].map((m) => m[1]));
+    const migrationTypes = [...sqlByName.values()].flatMap((sql) => [...sql.matchAll(/CREATE TYPE "([^"]+)"/g)].map((m) => m[1]));
+    const existingTables = new Set((await prisma.$queryRawUnsafe<{ table_name: string }[]>(`SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'`)).map((r) => r.table_name));
+    const existingTypes = new Set((await prisma.$queryRawUnsafe<{ typname: string }[]>(`SELECT t.typname FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace WHERE n.nspname = 'public' AND t.typtype = 'e'`)).map((r) => r.typname));
+    const partial = migrationTables.some((t) => existingTables.has(t)) || migrationTypes.some((t) => existingTypes.has(t));
+    if (!sentinel[0]?.exists && (applied.size > 0 || partial)) {
+      // An earlier run left the schema half-created (recorded without objects, or objects without a record). The core
+      // table is missing, so there is no business data yet: drop the partial objects and re-apply everything from scratch.
+      console.log(`[migrate] table "${SENTINEL_TABLE}" is missing but the schema is partially created — repairing (dropping partial objects, re-applying all migrations)`);
+      for (const table of migrationTables) await prisma.$executeRawUnsafe(`DROP TABLE IF EXISTS "${table}" CASCADE`);
+      for (const type of migrationTypes) await prisma.$executeRawUnsafe(`DROP TYPE IF EXISTS "${type}" CASCADE`);
       await prisma.$executeRawUnsafe(`DELETE FROM "_prisma_migrations"`);
       applied = new Set();
     }
-    const names = readdirSync(dir).filter((n) => existsSync(join(dir, n, "migration.sql"))).sort();
     let count = 0;
     for (const name of names) {
       if (applied.has(name)) continue;
-      const sql = readFileSync(join(dir, name, "migration.sql"), "utf8");
+      const sql = sqlByName.get(name)!;
       const statements = splitStatements(sql);
       console.log(`[migrate] applying ${name} (${statements.length} statements)`);
       let skipped = 0;
