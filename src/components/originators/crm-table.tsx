@@ -130,6 +130,7 @@ export function CrmTable({ rows, kind, year, storageKey }: { rows: OriginatorCrm
         columnLabels={COLUMN_LABELS}
         defaultHidden={["onHold", "relationship"]}
         maxHeight="calc(100vh - 300px)"
+        columnFilters={{ mode: "client", values: {}, exclude: ["contact"], placeholders: { casesYear: ">0", casesTotal: ">2", active: ">0", concluded: ">0", conversion: ">0.2", volume: ">10" } }}
         toolbarLeft={
           <div className="flex flex-wrap items-center gap-2">
             <div className="relative w-56">

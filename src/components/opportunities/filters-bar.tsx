@@ -63,7 +63,8 @@ export function FiltersBar({ page, years, companies, views, currentUserId, show 
   const yearOptions: Option[] = years.map((y) => ({ value: String(y), label: String(y) }));
   const agingOptions: Option[] = AGING_BUCKETS.map((b) => ({ value: b, label: `${b} dias` }));
 
-  const activeKeys = ["q", "years", "from", "to", "typeIds", "typeCategories", "statusKeys", "companyIds", "contactIds", "originatorCategories", "assigneeIds", "channels", "aging", "needsReview", "unassigned", "overdue", "noNextAction", "stale", "sector"].filter((k) => sp.get(k) && !lockedKeys.includes(k));
+  const cfKeys = Array.from(sp.keys()).filter((k) => k.startsWith("cf_") && sp.get(k));
+  const activeKeys = [...["q", "years", "from", "to", "typeIds", "typeCategories", "statusKeys", "companyIds", "contactIds", "originatorCategories", "assigneeIds", "channels", "aging", "needsReview", "unassigned", "overdue", "noNextAction", "stale", "sector"].filter((k) => sp.get(k) && !lockedKeys.includes(k)), ...cfKeys];
 
   function clearAll() {
     const next = new URLSearchParams();

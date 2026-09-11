@@ -101,3 +101,22 @@ export async function deleteAttachment(id: string): Promise<ActionResult<undefin
     return fail(errorMessage(e));
   }
 }
+
+/** Quick dated update from the pipe table — the modern equivalent of a "dd/mm - texto" line in the old sheet. */
+export async function addUpdate(opportunityId: string, text: string, dateISO?: string | null): Promise<ActionResult<{ id: string }>> {
+  try {
+    const user = await actionUser();
+    const body = text.trim();
+    if (!body) return fail("Escreva a atualização.");
+    const occurredAt = dateISO ? new Date(`${dateISO}T12:00:00Z`) : new Date();
+    const a = await prisma.activity.create({ data: { opportunityId, type: "NOTE", title: "Atualização", body, occurredAt, userId: user.id } });
+    await touch(opportunityId, occurredAt);
+    revalidatePath(`/opportunities/${opportunityId}`);
+    revalidatePath("/pipeline");
+    revalidatePath("/opportunities");
+    revalidatePath("/on-hold");
+    return ok({ id: a.id });
+  } catch (e) {
+    return fail(errorMessage(e));
+  }
+}

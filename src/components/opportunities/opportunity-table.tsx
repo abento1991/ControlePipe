@@ -9,6 +9,7 @@ import { AlertTriangle, ExternalLink, Mail, MessageCircle, Phone, Users, PlayCir
 import { DataTable, SelectCell, SelectHeader } from "@/components/data-table/data-table";
 import { StatusCell, AssigneesCell, NextActionCell, FollowUpCell } from "./quick-edit-cells";
 import { TextCell, TypeCell, ChannelCell, DateCell, AmountCell, OriginatorCell } from "./inline-cells";
+import { HistoryCell, FeedbackCell } from "./history-cells";
 import { TypeBadge, DaysBadge, StatusBadge } from "@/components/common/badges";
 import { AssigneeAvatars } from "@/components/common/user-avatar";
 import { Button } from "@/components/ui/button";
@@ -42,6 +43,8 @@ export const OPPORTUNITY_COLUMN_LABELS: Record<string, string> = {
   exitDate: "Saída",
   sector: "Setor",
   originatorRaw: "Contato (planilha)",
+  history: "Status da operação / atualizações",
+  feedback: "Motivo / feedback",
 };
 
 export function buildColumns(opts: { quickEdit: boolean; showReactivate?: boolean }): ColumnDef<OpportunityRowDTO, unknown>[] {
@@ -116,6 +119,22 @@ export function buildColumns(opts: { quickEdit: boolean; showReactivate?: boolea
     },
     { id: "assignees", accessorFn: (r) => r.assignees.map((a) => a.name).join(", "), header: "Responsáveis", size: 104, enableSorting: false, cell: ({ row }) => (opts.quickEdit ? <AssigneesCell id={row.original.id} assignees={row.original.assignees} /> : <AssigneeAvatars users={row.original.assignees} />) },
     { id: "status", accessorFn: (r) => r.status.name, header: "Status", size: 138, cell: ({ row }) => (opts.quickEdit ? <StatusCell id={row.original.id} status={row.original.status} /> : <StatusBadge name={row.original.status.name} color={row.original.status.color} group={row.original.status.group} />) },
+    {
+      id: "history",
+      accessorFn: (r) => r.lastUpdate?.text ?? r.legacyStatusText ?? "",
+      header: "Status da operação / atualizações",
+      size: 300,
+      enableSorting: false,
+      cell: ({ row }) => (opts.quickEdit ? <HistoryCell id={row.original.id} lastUpdate={row.original.lastUpdate} count={row.original.updatesCount} /> : <span className="text-xs block truncate" title={row.original.lastUpdate?.text ?? row.original.legacyStatusText ?? ""}>{row.original.lastUpdate ? `${formatDate(row.original.lastUpdate.date)} · ${row.original.lastUpdate.text}` : row.original.legacyStatusText ?? "—"}</span>),
+    },
+    {
+      id: "feedback",
+      accessorFn: (r) => r.closeReason ?? r.legacyFeedback ?? "",
+      header: "Motivo / feedback",
+      size: 220,
+      enableSorting: false,
+      cell: ({ row }) => <FeedbackCell id={row.original.id} closeReason={row.original.closeReason} legacyFeedback={row.original.legacyFeedback} />,
+    },
     { id: "amount", accessorKey: "amount", header: "Valor (R$ mm)", size: 100, cell: ({ row }) => (opts.quickEdit ? <AmountCell id={row.original.id} value={row.original.amount} raw={row.original.amountRaw} /> : <span className="tabular text-xs">{row.original.amount !== null ? formatMM(row.original.amount) : row.original.amountRaw ? <span className="text-muted-foreground">{row.original.amountRaw}</span> : "—"}</span>) },
     { id: "nextAction", accessorKey: "nextAction", header: "Próxima ação", size: 180, enableSorting: false, cell: ({ row }) => (opts.quickEdit ? <NextActionCell id={row.original.id} value={row.original.nextAction} /> : <span className="text-xs truncate block">{row.original.nextAction ?? "—"}</span>) },
     { id: "nextFollowUpAt", accessorKey: "nextFollowUpAt", header: "Follow-up", size: 96, cell: ({ row }) => (opts.quickEdit ? <FollowUpCell id={row.original.id} value={row.original.nextFollowUpAt} /> : <span className="text-xs tabular">{formatDate(row.original.nextFollowUpAt)}</span>) },
@@ -167,7 +186,7 @@ function ReactivateButton({ id, group }: { id: string; group: string }) {
 
 export function OpportunityTable({ rows, total, page, pageSize, storageKey, quickEdit = true, showReactivate = false, defaultHidden, exportBase, toolbarLeft }: { rows: OpportunityRowDTO[]; total: number; page: number; pageSize: number; storageKey: string; quickEdit?: boolean; showReactivate?: boolean; defaultHidden?: string[]; exportBase?: string; toolbarLeft?: React.ReactNode }) {
   const router = useRouter();
-  const { sp, set } = useUrlState();
+  const { sp, set, replaceAll } = useUrlState();
   const ref = useReference();
   const [selected, setSelected] = React.useState<RowSelectionState>({});
   const [pending, start] = React.useTransition();
@@ -189,6 +208,15 @@ export function OpportunityTable({ rows, total, page, pageSize, storageKey, quic
     });
   }
 
+  const columnFilterValues = React.useMemo(() => {
+    const v: Record<string, string> = {};
+    sp.forEach((val, key) => {
+      if (key.startsWith("cf_")) v[key.slice(3)] = val;
+    });
+    return v;
+  }, [sp]);
+  const filterPlaceholders: Record<string, string> = { entryDate: "2026-08 · 15/08/2026", daysInPipeline: ">30", amount: ">10 · 5-20", nextFollowUpAt: "2026-09", lastActivityAt: "2026-09", updatedAt: "2026-09", exitDate: "2025", legacyId: "#" };
+
   const exportHref = (format: "csv" | "xlsx") => {
     const p = new URLSearchParams(sp.toString());
     p.set("format", format);
@@ -204,12 +232,24 @@ export function OpportunityTable({ rows, total, page, pageSize, storageKey, quic
       onRowClick={(r) => router.push(`/opportunities/${r.id}`)}
       sorting={sorting}
       onSortingChange={(s) => set({ sort: s[0]?.id ?? null, dir: s[0] ? (s[0].desc ? "desc" : "asc") : null }, { resetPage: false })}
-      pagination={{ page, pageSize, total, onPageChange: (p) => set({ page: String(p) }, { resetPage: false }), onPageSizeChange: (s) => set({ pageSize: String(s) }) }}
+      pagination={total > pageSize ? { page, pageSize, total, onPageChange: (p) => set({ page: String(p) }, { resetPage: false }), onPageSizeChange: (s) => set({ pageSize: String(s) }) } : undefined}
+      footer={<span className="text-xs text-muted-foreground tabular">{total.toLocaleString("pt-BR")} registros · tabela única, sem páginas</span>}
       selection={{ selected, onChange: setSelected }}
       exportHref={exportHref}
       columnLabels={OPPORTUNITY_COLUMN_LABELS}
       stickyColumns={2}
-      defaultHidden={defaultHidden ?? ["legacyId", "updatedAt", "exitDate", "sector", "originatorRaw", "lastActivityAt"]}
+      columnFilters={{
+        mode: "server",
+        values: columnFilterValues,
+        onChange: (id, value) => set({ [`cf_${id}`]: value || null }),
+        onClearAll: () => {
+          const next = new URLSearchParams(sp.toString());
+          Array.from(next.keys()).filter((k) => k.startsWith("cf_") || k === "page").forEach((k) => next.delete(k));
+          replaceAll(next);
+        },
+        placeholders: filterPlaceholders,
+      }}
+      defaultHidden={defaultHidden ?? ["legacyId", "updatedAt", "exitDate", "sector", "originatorRaw", "lastActivityAt", "feedback"]}
       toolbarLeft={
         <div className="flex items-center gap-2 flex-wrap">
           {toolbarLeft}

@@ -236,6 +236,7 @@ const quickSchema = z.object({
   emailSubject: z.string().nullable().optional(),
   companyId: z.string().nullable().optional(),
   contactId: z.string().nullable().optional(),
+  closeReason: z.string().nullable().optional(),
 });
 
 /** Inline edits from tables (status, assignees, next action, follow-up date). */
@@ -306,6 +307,10 @@ export async function quickUpdateOpportunity(id: string, input: z.input<typeof q
       if (d.emailSubject !== undefined) {
         data.emailSubject = d.emailSubject?.trim() || null;
         changes.push({ field: "emailSubject", oldValue: before.emailSubject, newValue: data.emailSubject });
+      }
+      if (d.closeReason !== undefined) {
+        data.closeReason = d.closeReason?.trim() || null;
+        changes.push({ field: "closeReason", oldValue: before.closeReason, newValue: data.closeReason });
       }
       await tx.opportunity.update({ where: { id }, data });
       if (d.companyId !== undefined || d.contactId !== undefined) {

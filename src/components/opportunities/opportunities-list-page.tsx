@@ -9,7 +9,8 @@ export async function loadListPage(sp: SearchParamsLike, page: string, baseFilte
   const user = await requireUser();
   const filters = { ...parseFilters(sp), ...baseFilters };
   const pageNum = parseInt(typeof sp.page === "string" ? sp.page : "1", 10) || 1;
-  const pageSize = parseInt(typeof sp.pageSize === "string" ? sp.pageSize : "50", 10) || 50;
+  // Single table without pagination: every matching row is loaded (header stays fixed, the table scrolls).
+  const pageSize = parseInt(typeof sp.pageSize === "string" ? sp.pageSize : "5000", 10) || 5000;
   const sort = { id: typeof sp.sort === "string" ? sp.sort : "entryDate", desc: (typeof sp.dir === "string" ? sp.dir : "desc") === "desc" };
   const [list, options, views] = await Promise.all([
     listOpportunities({ filters, sort, page: pageNum, pageSize }),

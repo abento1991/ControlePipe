@@ -35,6 +35,12 @@ export interface DataTableProps<T> {
   defaultHidden?: string[];
   /** Number of leading visible columns pinned to the left while scrolling horizontally. */
   stickyColumns?: number;
+  /**
+   * Per-column header filters. "server": values are reported through onChange (debounced) and applied by the caller;
+   * "client": rows are filtered locally by a case-insensitive "contains" on the column value.
+   */
+  footer?: React.ReactNode;
+  columnFilters?: { mode: "server" | "client"; values: Record<string, string>; onChange?: (id: string, value: string) => void; onClearAll?: () => void; placeholders?: Record<string, string>; exclude?: string[] };
 }
 
 function loadJSON<T>(key: string, fallback: T): T {
@@ -46,7 +52,7 @@ function loadJSON<T>(key: string, fallback: T): T {
   }
 }
 
-export function DataTable<T>({ columns, data, storageKey, getRowId, onRowClick, sorting, onSortingChange, pagination, selection, toolbarLeft, toolbarRight, exportHref, renderMobileCard, emptyMessage = "Nenhum registro.", dense, maxHeight = "calc(100vh - 260px)", columnLabels = {}, defaultHidden = [], stickyColumns = 0 }: DataTableProps<T>) {
+export function DataTable<T>({ columns, data, storageKey, getRowId, onRowClick, sorting, onSortingChange, pagination, selection, toolbarLeft, toolbarRight, exportHref, renderMobileCard, emptyMessage = "Nenhum registro.", dense, maxHeight = "calc(100vh - 230px)", columnLabels = {}, defaultHidden = [], stickyColumns = 0, columnFilters, footer }: DataTableProps<T>) {
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(() => Object.fromEntries(defaultHidden.map((c) => [c, false])));
   const [columnSizing, setColumnSizing] = React.useState<ColumnSizingState>({});
   const [localSorting, setLocalSorting] = React.useState<SortingState>([]);
@@ -66,9 +72,42 @@ export function DataTable<T>({ columns, data, storageKey, getRowId, onRowClick, 
     } catch {}
   }, [columnVisibility, columnSizing, storageKey, hydrated]);
 
+  const [localFilters, setLocalFilters] = React.useState<Record<string, string>>(columnFilters?.values ?? {});
+  React.useEffect(() => {
+    if (columnFilters) setLocalFilters(columnFilters.values);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(columnFilters?.values ?? {})]);
+  const timers = React.useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  function setFilter(id: string, value: string) {
+    setLocalFilters((f) => ({ ...f, [id]: value }));
+    if (columnFilters?.mode === "server" && columnFilters.onChange) {
+      clearTimeout(timers.current[id]);
+      timers.current[id] = setTimeout(() => columnFilters.onChange!(id, value), 350);
+    }
+  }
+  const filteredData = React.useMemo(() => {
+    if (columnFilters?.mode !== "client") return data;
+    const active = Object.entries(localFilters).filter(([, v]) => v && v.trim());
+    if (!active.length) return data;
+    return data.filter((row) => active.every(([id, v]) => {
+      const col = columns.find((c) => c.id === id);
+      if (!col) return true;
+      const raw = "accessorFn" in col && col.accessorFn ? col.accessorFn(row, 0) : "accessorKey" in col && col.accessorKey ? (row as Record<string, unknown>)[String(col.accessorKey)] : "";
+      const text = raw === null || raw === undefined ? "" : typeof raw === "object" ? JSON.stringify(raw) : String(raw);
+      const needle = v.trim().toLowerCase();
+      const m = needle.match(/^(>=|<=|>|<)(-?\d+(?:[.,]\d+)?)$/);
+      if (m && typeof raw === "number") {
+        const n = parseFloat(m[2].replace(",", "."));
+        return m[1] === ">" ? raw > n : m[1] === "<" ? raw < n : m[1] === ">=" ? raw >= n : raw <= n;
+      }
+      return text.toLowerCase().includes(needle);
+    }));
+  }, [data, localFilters, columnFilters?.mode, columns]);
+  const anyFilter = Object.values(localFilters).some((v) => v && v.trim());
+
   const manualSorting = !!onSortingChange;
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns,
     getRowId,
     state: { columnVisibility, columnSizing, sorting: manualSorting ? sorting ?? [] : localSorting, rowSelection: selection?.selected ?? {} },
@@ -118,6 +157,22 @@ export function DataTable<T>({ columns, data, storageKey, getRowId, onRowClick, 
       <div className="flex flex-wrap items-center gap-2">
         {toolbarLeft}
         <div className="ml-auto flex items-center gap-1.5">
+          {columnFilters && anyFilter && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                const cleared = Object.fromEntries(Object.keys(localFilters).map((k) => [k, ""]));
+                setLocalFilters(cleared);
+                if (columnFilters.mode === "server") {
+                  if (columnFilters.onClearAll) columnFilters.onClearAll();
+                  else Object.keys(localFilters).forEach((k) => columnFilters.onChange?.(k, ""));
+                }
+              }}
+            >
+              Limpar filtros das colunas
+            </Button>
+          )}
           {toolbarRight}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -204,6 +259,28 @@ export function DataTable<T>({ columns, data, storageKey, getRowId, onRowClick, 
                 })}
               </TableRow>
             ))}
+            {columnFilters && (
+              <TableRow className="hover:bg-transparent">
+                {table.getVisibleLeafColumns().map((c) => {
+                  const excluded = c.id === "select" || c.id === "actions" || columnFilters.exclude?.includes(c.id);
+                  return (
+                    <th key={c.id} style={{ width: c.getSize(), ...stickyStyle(c.id) }} className={cn("px-1.5 pb-1.5 pt-0 align-top bg-card", stickyStyle(c.id).position && "bg-card")}>
+                      {!excluded && (
+                        <input
+                          type="search"
+                          value={localFilters[c.id] ?? ""}
+                          onChange={(e) => setFilter(c.id, e.target.value)}
+                          onClick={(e) => e.stopPropagation()}
+                          placeholder={columnFilters.placeholders?.[c.id] ?? "filtrar"}
+                          aria-label={`Filtrar ${columnLabels[c.id] ?? c.id}`}
+                          className={cn("h-6 w-full rounded border border-transparent bg-muted/60 px-1.5 text-2xs font-normal normal-case tracking-normal text-foreground placeholder:text-muted-foreground/70 focus:border-leto-green focus:bg-card focus:outline-none", localFilters[c.id] && "border-leto-green/70 bg-leto-green-faint")}
+                        />
+                      )}
+                    </th>
+                  );
+                })}
+              </TableRow>
+            )}
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows.length ? (
@@ -227,6 +304,7 @@ export function DataTable<T>({ columns, data, storageKey, getRowId, onRowClick, 
         </Table>
       </div>
 
+      {!pagination && footer && <div className="flex items-center gap-3 text-xs text-muted-foreground">{footer}{selection && Object.keys(selection.selected).length > 0 && <span>· {Object.keys(selection.selected).length} selecionados</span>}</div>}
       {pagination && (
         <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
           <span>

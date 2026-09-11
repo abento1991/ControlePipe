@@ -23,6 +23,11 @@ export const opportunityListSelect = {
   originatorCategory: true,
   operationTypeRaw: true,
   assigneesRaw: true,
+  legacyStatusText: true,
+  legacyFeedback: true,
+  closeReason: true,
+  activities: { where: { type: { in: ["NOTE", "EMAIL", "WHATSAPP", "MEETING", "CALL", "INFO_RECEIVED", "PROPOSAL_SENT", "LEGACY_STATUS", "STATUS_CHANGED", "REACTIVATED", "CLOSED", "FOLLOW_UP", "MEETING_SNAPSHOT"] } }, orderBy: [{ occurredAt: "desc" as const }, { createdAt: "desc" as const }], take: 1, select: { type: true, title: true, body: true, occurredAt: true, isLegacy: true } },
+  _count: { select: { activities: true } },
   operationType: { select: { id: true, name: true, color: true, category: true } },
   status: { select: { id: true, key: true, name: true, group: true, outcome: true, color: true } },
   assignees: { select: { isPrimary: true, user: { select: { id: true, name: true, initials: true, color: true, isArchived: true } } } },
@@ -54,6 +59,12 @@ export interface OpportunityRowDTO {
   originatorCategory: string | null;
   operationTypeRaw: string | null;
   assigneesRaw: string | null;
+  legacyStatusText: string | null;
+  legacyFeedback: string | null;
+  closeReason: string | null;
+  /** Latest history entry (activity) for the "Atualizações" column. */
+  lastUpdate: { date: string; text: string; type: string; isLegacy: boolean } | null;
+  updatesCount: number;
   operationType: { id: string; name: string; color: string | null; category: string } | null;
   status: { id: string; key: string; name: string; group: string; outcome: string; color: string | null };
   assignees: { id: string; name: string; initials: string | null; color: string | null; isArchived: boolean; isPrimary: boolean }[];
@@ -89,6 +100,11 @@ export function toRowDTO(o: OpportunityListRow, now: Date = new Date()): Opportu
     originatorCategory: o.originatorCategory,
     operationTypeRaw: o.operationTypeRaw,
     assigneesRaw: o.assigneesRaw,
+    legacyStatusText: o.legacyStatusText,
+    legacyFeedback: o.legacyFeedback,
+    closeReason: o.closeReason,
+    lastUpdate: o.activities[0] ? { date: o.activities[0].occurredAt.toISOString(), text: (o.activities[0].body ?? o.activities[0].title ?? "").trim(), type: o.activities[0].type, isLegacy: o.activities[0].isLegacy } : null,
+    updatesCount: o._count.activities,
     operationType: o.operationType,
     status: o.status,
     assignees: o.assignees.map((a) => ({ ...a.user, isPrimary: a.isPrimary })),
@@ -115,7 +131,7 @@ const SORT_MAP: Record<string, (desc: boolean) => Prisma.OpportunityOrderByWithR
 
 export async function listOpportunities(params: ListParams): Promise<{ rows: OpportunityRowDTO[]; total: number; page: number; pageSize: number }> {
   const page = Math.max(1, params.page ?? 1);
-  const pageSize = Math.min(500, Math.max(10, params.pageSize ?? 50));
+  const pageSize = Math.min(20000, Math.max(10, params.pageSize ?? 5000));
   const where = buildWhere(params.filters);
   const sort = params.sort ?? { id: "entryDate", desc: true };
   const orderBy = (SORT_MAP[sort.id] ?? SORT_MAP.entryDate)(sort.desc);

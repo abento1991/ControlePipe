@@ -44,7 +44,7 @@ export default async function OnHoldPage({ searchParams }: { searchParams: Promi
           );
         })}
       </div>
-      <ListView data={data} page="on-hold" storageKey={`leto:table:onhold:${tabKey}`} quickEdit={false} showReactivate lockedKeys={["groups", "tab"]} show={{ aging: false, flags: false }} defaultHidden={["legacyId", "updatedAt", "sector", "originatorRaw", "nextAction", "nextFollowUpAt", "entryChannel"]} exportBase="on-hold" />
+      <ListView data={data} page="on-hold" storageKey={`leto:table:onhold:${tabKey}`} quickEdit={false} showReactivate lockedKeys={["groups", "tab"]} show={{ aging: false, flags: false }} defaultHidden={["legacyId", "updatedAt", "sector", "originatorRaw", "nextAction", "nextFollowUpAt", "entryChannel", "lastActivityAt"]} exportBase="on-hold" />
     </>
   );
 }

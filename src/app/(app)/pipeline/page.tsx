@@ -1,6 +1,9 @@
 import { PageHeader } from "@/components/common/page-header";
 import { loadListPage, ListView } from "@/components/opportunities/opportunities-list-page";
 import { QuickAddRow } from "@/components/opportunities/quick-add-row";
+import { NewOpportunityButton } from "@/components/opportunities/new-opportunity-button";
+import { Button } from "@/components/ui/button";
+import { FileSpreadsheet } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { formatMM } from "@/lib/utils";
 import type { SearchParamsLike } from "@/lib/queries/filters";
@@ -16,7 +19,15 @@ export default async function PipelinePage({ searchParams }: { searchParams: Pro
   return (
     <>
       <PageHeader title="Pipe Ativo" description="Clique em qualquer célula para editar (nome, tipo, data, originador, responsáveis, status, valor, próxima ação, follow-up). Use a seta ao lado do nome para abrir a página completa da oportunidade.">
-        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="outline" asChild>
+            <a href="/api/export/backup" title="Baixa um Excel completo com todas as oportunidades, histórico, empresas e contatos">
+              <FileSpreadsheet /> Exportar Excel (backup)
+            </a>
+          </Button>
+          <NewOpportunityButton variant="accent" size="default" label="Novo caso" />
+        </div>
+        <div className="flex items-center gap-4 text-xs text-muted-foreground w-full">
           <span>
             <span className="font-semibold text-foreground tabular">{agg._count}</span> ativas
           </span>

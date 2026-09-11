@@ -14,7 +14,7 @@ export default async function OpportunitiesPage({ searchParams }: { searchParams
       <PageHeader title="Todas as Oportunidades" description={`Histórico completo — ${data.list.total.toLocaleString("pt-BR")} registros com os filtros atuais.`}>
         <NewOpportunityButton variant="outline" />
       </PageHeader>
-      <ListView data={data} page="opportunities" storageKey="leto:table:all" quickEdit defaultHidden={["updatedAt", "sector", "originatorRaw", "lastActivityAt", "nextAction", "nextFollowUpAt"]} />
+      <ListView data={data} page="opportunities" storageKey="leto:table:all" quickEdit defaultHidden={["updatedAt", "sector", "originatorRaw", "lastActivityAt", "nextAction", "nextFollowUpAt", "entryChannel"]} />
     </>
   );
 }

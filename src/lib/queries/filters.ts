@@ -21,6 +21,8 @@ export interface OpportunityFilters {
   stale?: number; // days without activity
   aging?: string[]; // "<15" | "15–30" | ...
   sector?: string;
+  /** Per-column header filters (column id → typed text). Serialized as cf_<column>. */
+  columnFilters?: Record<string, string>;
 }
 
 export interface ListParams {
@@ -58,6 +60,11 @@ export function parseFilters(sp: SearchParamsLike): OpportunityFilters {
   if (sp.noNextAction === "1") f.noNextAction = true;
   if (typeof sp.stale === "string" && sp.stale) f.stale = parseInt(sp.stale, 10);
   if (typeof sp.sector === "string" && sp.sector) f.sector = sp.sector;
+  const cf: Record<string, string> = {};
+  for (const [k, v] of Object.entries(sp)) {
+    if (k.startsWith("cf_") && typeof v === "string" && v.trim()) cf[k.slice(3)] = v.trim();
+  }
+  if (Object.keys(cf).length) f.columnFilters = cf;
   return f;
 }
 
@@ -77,6 +84,7 @@ export function filtersToSearchParams(f: OpportunityFilters): URLSearchParams {
   if (f.noNextAction) sp.set("noNextAction", "1");
   if (f.stale) sp.set("stale", String(f.stale));
   if (f.sector) sp.set("sector", f.sector);
+  for (const [k, v] of Object.entries(f.columnFilters ?? {})) if (v) sp.set(`cf_${k}`, v);
   return sp;
 }
 
@@ -84,6 +92,10 @@ export function countActiveFilters(f: OpportunityFilters): number {
   let n = 0;
   for (const [k, v] of Object.entries(f)) {
     if (k === "groups") continue;
+    if (k === "columnFilters") {
+      n += Object.values((v as Record<string, string>) ?? {}).filter(Boolean).length;
+      continue;
+    }
     if (Array.isArray(v) ? v.length : v) n++;
   }
   return n;
@@ -105,6 +117,124 @@ function agingRange(bucket: string, now: Date): { gte?: Date; lt?: Date } | null
       return { lt: d(91) };
     default:
       return null;
+  }
+}
+
+/** "2026", "2026-08", "08/2026", "15/08/2026" → date range. */
+export function parseDateFilter(text: string): { gte: Date; lt: Date } | null {
+  const t = text.trim();
+  let m = t.match(/^(\d{4})$/);
+  if (m) return { gte: new Date(Date.UTC(+m[1], 0, 1)), lt: new Date(Date.UTC(+m[1] + 1, 0, 1)) };
+  m = t.match(/^(\d{4})-(\d{1,2})$/) ?? t.match(/^(\d{1,2})\/(\d{4})$/);
+  if (m) {
+    const y = m[0].startsWith(m[1]) && m[1].length === 4 ? +m[1] : +m[2];
+    const mo = m[1].length === 4 ? +m[2] : +m[1];
+    return { gte: new Date(Date.UTC(y, mo - 1, 1)), lt: new Date(Date.UTC(y, mo, 1)) };
+  }
+  m = t.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (m) {
+    const d = new Date(Date.UTC(+m[3], +m[2] - 1, +m[1]));
+    return { gte: d, lt: new Date(d.getTime() + 86400000) };
+  }
+  m = t.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (m) {
+    const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+    return { gte: d, lt: new Date(d.getTime() + 86400000) };
+  }
+  return null;
+}
+
+/** ">30", "<15", ">=10", "30" (≥ 30), "10-20" (range) → numeric comparison. */
+export function parseNumberFilter(text: string): { gte?: number; lte?: number; gt?: number; lt?: number } | null {
+  const t = text.replace(/\s/g, "").replace(",", ".");
+  let m = t.match(/^(>=|<=|>|<|=)?(-?\d+(?:\.\d+)?)$/);
+  if (m) {
+    const n = parseFloat(m[2]);
+    switch (m[1]) {
+      case ">":
+        return { gt: n };
+      case "<":
+        return { lt: n };
+      case "<=":
+        return { lte: n };
+      case "=":
+        return { gte: n, lte: n };
+      default:
+        return { gte: n };
+    }
+  }
+  m = t.match(/^(-?\d+(?:\.\d+)?)-(-?\d+(?:\.\d+)?)$/);
+  if (m) return { gte: parseFloat(m[1]), lte: parseFloat(m[2]) };
+  return null;
+}
+
+const CHANNEL_TEXT: Record<string, string> = { EMAIL: "e-mail email", WHATSAPP: "whatsapp", LIGACAO: "ligação ligacao", REUNIAO: "reunião reuniao", INDICACAO: "indicação indicacao", ORIGINACAO_PROPRIA: "originação própria originacao propria", OUTRO: "outro" };
+
+function daysRange(n: { gte?: number; lte?: number; gt?: number; lt?: number }, now: Date): Prisma.DateTimeNullableFilter {
+  // more days in pipeline = earlier entry date
+  const day = 86400000;
+  const r: Prisma.DateTimeNullableFilter = {};
+  if (n.gte !== undefined) r.lte = new Date(now.getTime() - n.gte * day);
+  if (n.gt !== undefined) r.lt = new Date(now.getTime() - n.gt * day);
+  if (n.lte !== undefined) r.gte = new Date(now.getTime() - n.lte * day);
+  if (n.lt !== undefined) r.gt = new Date(now.getTime() - n.lt * day);
+  return r;
+}
+
+const ci = (v: string) => ({ contains: v, mode: "insensitive" as const });
+
+/** Translates one header filter into a where clause. Unknown columns fall back to searching the name. */
+export function columnFilterWhere(column: string, text: string, now: Date): Prisma.OpportunityWhereInput | null {
+  const v = text.trim();
+  if (!v) return null;
+  switch (column) {
+    case "legacyId":
+      return /^\d+$/.test(v) ? { legacyId: parseInt(v, 10) } : { name: ci(v) };
+    case "name":
+      return { OR: [{ name: ci(v) }, { economicGroup: ci(v) }, { nameRaw: ci(v) }] };
+    case "operationType":
+      return { OR: [{ operationType: { name: ci(v) } }, { operationTypeRaw: ci(v) }] };
+    case "status":
+      return { OR: [{ status: { name: ci(v) } }, { statusRaw: ci(v) }] };
+    case "company":
+      return { OR: [{ originators: { some: { company: { OR: [{ name: ci(v) }, { shortName: ci(v) }] } } } }, { originatorRaw: ci(v) }] };
+    case "contact":
+      return { OR: [{ originators: { some: { contact: { fullName: ci(v) } } } }, { originatorRaw: ci(v) }] };
+    case "originatorRaw":
+      return { originatorRaw: ci(v) };
+    case "assignees":
+      return { OR: [{ assignees: { some: { user: { name: ci(v) } } } }, { assigneesRaw: ci(v) }] };
+    case "entryChannel": {
+      const keys = Object.entries(CHANNEL_TEXT).filter(([, t]) => t.includes(v.toLowerCase())).map(([k]) => k);
+      return keys.length ? { entryChannel: { in: keys as Prisma.EnumEntryChannelNullableFilter["in"] } } : { entryChannel: { in: [] } };
+    }
+    case "nextAction":
+      return { nextAction: ci(v) };
+    case "sector":
+      return { sector: ci(v) };
+    case "history":
+      return { OR: [{ legacyStatusText: ci(v) }, { activities: { some: { body: ci(v) } } }, { notes: { some: { body: ci(v) } } }] };
+    case "feedback":
+      return { OR: [{ closeReason: ci(v) }, { legacyFeedback: ci(v) }] };
+    case "amount": {
+      const n = parseNumberFilter(v);
+      return n ? { amount: n } : { amountRaw: ci(v) };
+    }
+    case "daysInPipeline": {
+      const n = parseNumberFilter(v);
+      return n ? { entryDate: daysRange(n, now) } : null;
+    }
+    case "entryDate":
+    case "nextFollowUpAt":
+    case "lastActivityAt":
+    case "updatedAt":
+    case "exitDate": {
+      const r = parseDateFilter(v);
+      if (!r) return null;
+      return { [column]: { gte: r.gte, lt: r.lt } } as Prisma.OpportunityWhereInput;
+    }
+    default:
+      return { name: ci(v) };
   }
 }
 
@@ -155,5 +285,9 @@ export function buildWhere(f: OpportunityFilters, now: Date = new Date()): Prism
     if (ors.length) and.push({ OR: ors.map((r) => ({ entryDate: r })) });
   }
   if (f.sector) and.push({ sector: { contains: f.sector, mode: "insensitive" } });
+  for (const [col, text] of Object.entries(f.columnFilters ?? {})) {
+    const w = columnFilterWhere(col, text, now);
+    if (w) and.push(w);
+  }
   return { AND: and };
 }
