@@ -23,7 +23,10 @@ export async function seedReferenceData(prisma: PrismaClient, opts: { passwordHa
   for (const m of TEAM_MEMBERS) {
     const existing = await prisma.user.findUnique({ where: { email: m.email } });
     if (existing) {
-      await prisma.user.update({ where: { id: existing.id }, data: { name: m.name, isArchived: m.isArchived, color: m.color, initials: initialsOf(m.name.replace(/\(.*\)/, "")) } });
+      await prisma.user.update({
+        where: { id: existing.id },
+        data: { name: m.name, isArchived: m.isArchived, color: m.color, initials: initialsOf(m.name.replace(/\(.*\)/, "")), ...(!existing.passwordHash && !m.isArchived && opts.passwordHash ? { passwordHash: opts.passwordHash } : {}) },
+      });
     } else {
       await prisma.user.create({
         data: {

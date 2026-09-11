@@ -1,14 +1,17 @@
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/session";
+import { prisma } from "@/lib/db";
 import { LoginForm } from "./login-form";
 
 export const metadata = { title: "Entrar" };
+export const dynamic = "force-dynamic";
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ callbackUrl?: string; error?: string }> }) {
   const user = await getSessionUser();
   const sp = await searchParams;
   if (user) redirect(sp.callbackUrl && sp.callbackUrl.startsWith("/") ? sp.callbackUrl : "/pipeline");
+  const users = await prisma.user.findMany({ where: { isActive: true, isArchived: false, passwordHash: { not: null } }, orderBy: { name: "asc" }, select: { name: true, email: true, initials: true, color: true } }).catch(() => []);
   return (
     <div className="min-h-screen grid lg:grid-cols-[1.1fr_1fr]">
       <div className="hidden lg:flex flex-col justify-between bg-leto-ink text-white p-12 relative overflow-hidden">
@@ -29,8 +32,8 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
             <Image src="/brand/leto-logo-dark.svg" alt="Leto Capital" width={160} height={48} priority />
           </div>
           <h2 className="text-xl font-semibold tracking-tight">Entrar</h2>
-          <p className="text-sm text-muted-foreground mt-1 mb-6">Use seu e-mail corporativo e senha.</p>
-          <LoginForm callbackUrl={sp.callbackUrl} initialError={sp.error} />
+          <p className="text-sm text-muted-foreground mt-1 mb-6">Escolha seu nome e digite a senha da equipe.</p>
+          <LoginForm callbackUrl={sp.callbackUrl} initialError={sp.error} users={users} />
         </div>
       </div>
     </div>
