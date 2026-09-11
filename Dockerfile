@@ -25,9 +25,8 @@ ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000 HOSTNAME="::"
 COPY --from=build /app/.next/standalone ./
 COPY --from=build /app/.next/static ./.next/static
 COPY --from=build /app/public ./public
-# Prisma CLI + client + engines for migrations, and the runtime deps of the bundled scripts
+# Prisma client + engines (migrations are applied by dist/migrate-fallback.cjs), and the runtime deps of the bundled scripts
 COPY --from=build /app/prisma ./prisma
-COPY --from=build /app/node_modules/prisma ./node_modules/prisma
 COPY --from=build /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=build /app/node_modules/bcryptjs ./node_modules/bcryptjs
