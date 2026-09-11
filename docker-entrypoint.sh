@@ -47,7 +47,12 @@ if [ -z "$MISSING" ]; then
         log "seeding reference data and users"
         node ./dist/seed.cjs >> "$LOG" 2>&1 && log "seed done" || log "seed FAILED (see log above)"
       fi
-      WB="${PIPELINE_WORKBOOK:-./data/Acompanhamento do Pipe_20260817.xlsx}"
+      DEFAULT_WB="./data/Acompanhamento do Pipe_20260817.xlsx"
+      WB="${PIPELINE_WORKBOOK:-$DEFAULT_WB}"
+      if [ -n "$PIPELINE_WORKBOOK" ] && [ ! -f "$WB" ]; then
+        log "PIPELINE_WORKBOOK does not point to a file — using the bundled workbook instead"
+        WB="$DEFAULT_WB"
+      fi
       if [ "${IMPORT_ON_BOOT:-1}" = "1" ] && [ -f "$WB" ]; then
         log "importing workbook (idempotent): $WB"
         node ./dist/import-pipeline.cjs "$WB" >> "$LOG" 2>&1 && log "import done" || log "import FAILED (see log above)"
