@@ -181,33 +181,23 @@ scripts/dev-reset-db.sh   # DEV: dropa/recria o banco local, aplica migrations, 
 
 ## Como fazer deploy
 
-Sugestão: **Vercel** (app) + **Supabase** ou **Neon** (PostgreSQL).
+O app precisa de um servidor Node e de um PostgreSQL. Três caminhos prontos no repositório:
 
-1. Crie o banco e pegue a `DATABASE_URL`.
-2. Configure as variáveis de ambiente no provedor (`DATABASE_URL`, `AUTH_SECRET`, `AUTH_URL`, `AUTH_TRUST_HOST=true`).
-3. Rode `npm run db:migrate` e `npm run db:seed` apontando para o banco (local, com a URL de produção, ou em um job de CI).
-4. Rode `npm run import:pipeline` uma vez para carregar o histórico.
-5. Deploy: o `build` executa `prisma generate && next build`. A saída é `standalone`, então também funciona em Docker/Railway/Render (`node .next/standalone/server.js`).
+**1. Render (mais rápido — banco + app em um clique).** O arquivo `render.yaml` é um *Blueprint* que provisiona o PostgreSQL 16 e o serviço web (Docker) juntos.
+1. No Render: *New → Blueprint*, conecte este repositório e a branch.
+2. Preencha `SEED_DEFAULT_PASSWORD` quando o Render pedir (única variável manual; `AUTH_SECRET` é gerado, `DATABASE_URL` e `AUTH_URL` são ligados automaticamente).
+3. No primeiro boot o container aplica migrations, cria os usuários e importa a planilha `data/*.xlsx` (idempotente). Depois, acesse a URL `https://leto-pipeline.onrender.com` (ou a que o Render atribuir) e faça login.
 
-Alternativa Docker:
+**2. Docker em qualquer host (Railway, Fly.io, VPS).** `Dockerfile` + `docker-entrypoint.sh` fazem o mesmo bootstrap (migrate → seed → import → start). Variáveis: `DATABASE_URL`, `AUTH_SECRET`, `AUTH_URL`, `AUTH_TRUST_HOST=true`, `SEED_DEFAULT_PASSWORD`; opcionais `IMPORT_ON_BOOT=0` e `SKIP_SEED=1` após a primeira execução.
 
-```Dockerfile
-FROM node:20-alpine AS build
-WORKDIR /app
-COPY package*.json prisma ./
-RUN npm ci
-COPY . .
-RUN npm run build
-FROM node:20-alpine
-WORKDIR /app
-COPY --from=build /app/.next/standalone ./
-COPY --from=build /app/.next/static ./.next/static
-COPY --from=build /app/public ./public
-EXPOSE 3000
-CMD ["node", "server.js"]
+```bash
+docker build -t leto-pipeline .
+docker run -p 3000:3000 --env-file .env leto-pipeline
 ```
 
-Health check: `GET /api/health`.
+**3. Vercel + Supabase/Neon.** `vercel.json` já define o build (`prisma generate && prisma migrate deploy && next build`). Crie o banco (Supabase/Neon), defina as variáveis no projeto Vercel e importe a planilha uma vez localmente apontando `DATABASE_URL` para o banco de produção: `npm run import:pipeline`.
+
+Health check em todos os casos: `GET /api/health`.
 
 ## Estrutura dos dados
 

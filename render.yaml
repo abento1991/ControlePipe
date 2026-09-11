@@ -1,0 +1,32 @@
+# Render Blueprint — provisions PostgreSQL + the web service in one click.
+# https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: leto-pipeline
+    runtime: docker
+    plan: starter
+    region: ohio
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: leto-pipeline-db
+          property: connectionString
+      - key: AUTH_SECRET
+        generateValue: true
+      - key: AUTH_TRUST_HOST
+        value: "true"
+      - key: AUTH_URL
+        fromService:
+          type: web
+          name: leto-pipeline
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: SEED_DEFAULT_PASSWORD
+        sync: false
+      - key: IMPORT_ON_BOOT
+        value: "1"
+databases:
+  - name: leto-pipeline-db
+    plan: basic-256mb
+    region: ohio
+    postgresMajorVersion: "16"
