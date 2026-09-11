@@ -14,8 +14,8 @@ export interface EntityOption {
 }
 
 /** Async combobox backed by /api/lookup. Used for companies and contacts. */
-export function EntityCombobox({ kind, value, onChange, placeholder, companyId, onCreate, className, disabled }: { kind: "company" | "contact"; value: EntityOption | null; onChange: (v: EntityOption | null) => void; placeholder?: string; companyId?: string | null; onCreate?: (query: string) => void; className?: string; disabled?: boolean }) {
-  const [open, setOpen] = useState(false);
+export function EntityCombobox({ kind, value, onChange, placeholder, companyId, onCreate, className, disabled, autoOpen }: { kind: "company" | "contact"; value: EntityOption | null; onChange: (v: EntityOption | null) => void; placeholder?: string; companyId?: string | null; onCreate?: (query: string) => void; className?: string; disabled?: boolean; autoOpen?: boolean }) {
+  const [open, setOpen] = useState(!!autoOpen);
   const [q, setQ] = useState("");
   const [items, setItems] = useState<EntityOption[]>([]);
   const [loading, setLoading] = useState(false);

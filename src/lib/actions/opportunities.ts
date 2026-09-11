@@ -227,6 +227,15 @@ const quickSchema = z.object({
   nextAction: z.string().nullable().optional(),
   nextFollowUpAt: z.string().nullable().optional(),
   amount: z.union([z.number(), z.string(), z.null()]).optional(),
+  name: z.string().optional(),
+  economicGroup: z.string().nullable().optional(),
+  sector: z.string().nullable().optional(),
+  operationTypeId: z.string().nullable().optional(),
+  entryDate: z.string().nullable().optional(),
+  entryChannel: z.enum(["EMAIL", "WHATSAPP", "LIGACAO", "REUNIAO", "INDICACAO", "ORIGINACAO_PROPRIA", "OUTRO"]).nullable().optional(),
+  emailSubject: z.string().nullable().optional(),
+  companyId: z.string().nullable().optional(),
+  contactId: z.string().nullable().optional(),
 });
 
 /** Inline edits from tables (status, assignees, next action, follow-up date). */
@@ -266,7 +275,54 @@ export async function quickUpdateOpportunity(id: string, input: z.input<typeof q
         data.amount = n !== null && Number.isFinite(n) ? n : null;
         changes.push({ field: "amount", oldValue: before.amount === null ? null : Number(before.amount), newValue: data.amount });
       }
+      if (d.name !== undefined) {
+        const name = d.name.trim();
+        if (name.length < 2) throw new Error("Informe o nome da oportunidade.");
+        data.name = name;
+        changes.push({ field: "name", oldValue: before.name, newValue: name });
+      }
+      if (d.economicGroup !== undefined) {
+        data.economicGroup = d.economicGroup?.trim() || null;
+        changes.push({ field: "economicGroup", oldValue: before.economicGroup, newValue: data.economicGroup });
+      }
+      if (d.sector !== undefined) {
+        data.sector = d.sector?.trim() || null;
+        changes.push({ field: "sector", oldValue: before.sector, newValue: data.sector });
+      }
+      if (d.operationTypeId !== undefined) {
+        data.operationTypeId = d.operationTypeId || null;
+        changes.push({ field: "operationTypeId", oldValue: before.operationTypeId, newValue: data.operationTypeId });
+      }
+      if (d.entryDate !== undefined) {
+        const dt = d.entryDate ? new Date(`${d.entryDate}T00:00:00Z`) : null;
+        data.entryDate = dt;
+        data.entryYear = dt ? dt.getUTCFullYear() : before.entryYear;
+        changes.push({ field: "entryDate", oldValue: before.entryDate, newValue: dt });
+      }
+      if (d.entryChannel !== undefined) {
+        data.entryChannel = d.entryChannel;
+        changes.push({ field: "entryChannel", oldValue: before.entryChannel, newValue: d.entryChannel });
+      }
+      if (d.emailSubject !== undefined) {
+        data.emailSubject = d.emailSubject?.trim() || null;
+        changes.push({ field: "emailSubject", oldValue: before.emailSubject, newValue: data.emailSubject });
+      }
       await tx.opportunity.update({ where: { id }, data });
+      if (d.companyId !== undefined || d.contactId !== undefined) {
+        const prev = await tx.opportunityOriginator.findFirst({ where: { opportunityId: id, role: "PRIMARY" } });
+        const companyId = d.companyId !== undefined ? d.companyId || null : prev?.companyId ?? null;
+        const contactId = d.contactId !== undefined ? d.contactId || null : prev?.contactId ?? null;
+        await tx.opportunityOriginator.upsert({
+          where: { opportunityId_role: { opportunityId: id, role: "PRIMARY" } },
+          update: { companyId, contactId, needsReview: false, confidence: 1, migrationNotes: prev?.migrationNotes ? `${prev.migrationNotes}; corrigido manualmente` : "definido manualmente" },
+          create: { opportunityId: id, role: "PRIMARY", companyId, contactId, confidence: 1 },
+        });
+        if (companyId) {
+          const c = await tx.company.findUnique({ where: { id: companyId }, select: { category: true } });
+          if (c) await tx.opportunity.update({ where: { id }, data: { originatorCategory: c.category } });
+        }
+        changes.push({ field: "companyId", oldValue: prev?.companyId ?? null, newValue: companyId }, { field: "contactId", oldValue: prev?.contactId ?? null, newValue: contactId });
+      }
       if (d.assigneeIds) {
         const prev = before.assignees.map((a) => a.userId).sort();
         const next = [...d.assigneeIds].sort();

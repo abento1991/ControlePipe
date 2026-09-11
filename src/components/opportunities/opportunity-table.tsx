@@ -1,12 +1,14 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ColumnDef, RowSelectionState, SortingState } from "@tanstack/react-table";
 import { toast } from "sonner";
-import { AlertTriangle, Mail, MessageCircle, Phone, Users, PlayCircle, PauseCircle, XCircle } from "lucide-react";
+import { AlertTriangle, ExternalLink, Mail, MessageCircle, Phone, Users, PlayCircle, PauseCircle, XCircle } from "lucide-react";
 import { DataTable, SelectCell, SelectHeader } from "@/components/data-table/data-table";
 import { StatusCell, AssigneesCell, NextActionCell, FollowUpCell } from "./quick-edit-cells";
+import { TextCell, TypeCell, ChannelCell, DateCell, AmountCell, OriginatorCell } from "./inline-cells";
 import { TypeBadge, DaysBadge, StatusBadge } from "@/components/common/badges";
 import { AssigneeAvatars } from "@/components/common/user-avatar";
 import { Button } from "@/components/ui/button";
@@ -50,12 +52,21 @@ export function buildColumns(opts: { quickEdit: boolean; showReactivate?: boolea
       id: "name",
       accessorKey: "name",
       header: "Oportunidade",
-      size: 260,
+      size: 250,
       enableHiding: false,
       cell: ({ row }) => (
         <div className="min-w-0">
           <div className="flex items-center gap-1.5">
-            <span className="font-medium truncate">{row.original.name}</span>
+            {opts.quickEdit ? (
+              <>
+                <TextCell id={row.original.id} field="name" value={row.original.name} strong className="flex-1" />
+                <Link href={`/opportunities/${row.original.id}`} onClick={(e) => e.stopPropagation()} className="shrink-0 rounded p-0.5 text-muted-foreground hover:text-leto-green-deep hover:bg-muted" title="Abrir oportunidade">
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </Link>
+              </>
+            ) : (
+              <span className="font-medium truncate">{row.original.name}</span>
+            )}
             {row.original.needsReview && (
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -69,32 +80,31 @@ export function buildColumns(opts: { quickEdit: boolean; showReactivate?: boolea
         </div>
       ),
     },
-    { id: "operationType", accessorFn: (r) => r.operationType?.name ?? "", header: "Tipo", size: 160, cell: ({ row }) => <TypeBadge name={row.original.operationType?.name} color={row.original.operationType?.color} /> },
-    { id: "entryDate", accessorKey: "entryDate", header: "Entrada", size: 92, cell: ({ getValue }) => <span className="tabular text-xs">{formatDate(getValue<string | null>())}</span> },
-    { id: "daysInPipeline", accessorKey: "daysInPipeline", header: "Dias", size: 60, cell: ({ getValue }) => <DaysBadge days={getValue<number | null>()} /> },
+    { id: "operationType", accessorFn: (r) => r.operationType?.name ?? "", header: "Tipo", size: 145, cell: ({ row }) => (opts.quickEdit ? <TypeCell id={row.original.id} type={row.original.operationType} /> : <TypeBadge name={row.original.operationType?.name} color={row.original.operationType?.color} />) },
+    { id: "entryDate", accessorKey: "entryDate", header: "Entrada", size: 90, cell: ({ row }) => (opts.quickEdit ? <DateCell id={row.original.id} field="entryDate" value={row.original.entryDate} /> : <span className="tabular text-xs">{formatDate(row.original.entryDate)}</span>) },
+    { id: "daysInPipeline", accessorKey: "daysInPipeline", header: "Dias", size: 54, cell: ({ getValue }) => <DaysBadge days={getValue<number | null>()} /> },
     {
       id: "company",
       accessorFn: (r) => r.company?.name ?? "",
       header: "Empresa originadora",
-      size: 170,
-      cell: ({ row }) => (row.original.company ? <span className="truncate block text-xs">{row.original.company.shortName ?? row.original.company.name}</span> : <span className="text-2xs text-muted-foreground truncate block">{row.original.contact ? "" : row.original.originatorRaw ?? "—"}</span>),
+      size: 150,
+      cell: ({ row }) => (opts.quickEdit ? <OriginatorCell id={row.original.id} kind="company" company={row.original.company} contact={row.original.contact} rawText={row.original.originatorRaw} /> : row.original.company ? <span className="truncate block text-xs">{row.original.company.shortName ?? row.original.company.name}</span> : <span className="text-2xs text-muted-foreground truncate block">{row.original.contact ? "" : row.original.originatorRaw ?? "—"}</span>),
     },
     {
       id: "contact",
       accessorFn: (r) => r.contact?.fullName ?? "",
       header: "Originador",
-      size: 160,
-      cell: ({ row }) => (
-        <span className={cn("truncate block text-xs", row.original.originatorNeedsReview && "text-warning")}>{row.original.contact?.fullName ?? (row.original.company ? "" : "")}</span>
-      ),
+      size: 140,
+      cell: ({ row }) => (opts.quickEdit ? <OriginatorCell id={row.original.id} kind="contact" company={row.original.company} contact={row.original.contact} rawText={row.original.originatorRaw} /> : <span className={cn("truncate block text-xs", row.original.originatorNeedsReview && "text-warning")}>{row.original.contact?.fullName ?? ""}</span>),
     },
     {
       id: "entryChannel",
       accessorKey: "entryChannel",
       header: "Canal",
-      size: 90,
-      cell: ({ getValue }) => {
+      size: 84,
+      cell: ({ getValue, row }) => {
         const v = getValue<string | null>();
+        if (opts.quickEdit) return <ChannelCell id={row.original.id} value={v} />;
         if (!v) return <span className="text-2xs text-muted-foreground">—</span>;
         const Icon = CHANNEL_ICON[v];
         return (
@@ -104,15 +114,15 @@ export function buildColumns(opts: { quickEdit: boolean; showReactivate?: boolea
         );
       },
     },
-    { id: "assignees", accessorFn: (r) => r.assignees.map((a) => a.name).join(", "), header: "Responsáveis", size: 120, enableSorting: false, cell: ({ row }) => (opts.quickEdit ? <AssigneesCell id={row.original.id} assignees={row.original.assignees} /> : <AssigneeAvatars users={row.original.assignees} />) },
-    { id: "status", accessorFn: (r) => r.status.name, header: "Status", size: 150, cell: ({ row }) => (opts.quickEdit ? <StatusCell id={row.original.id} status={row.original.status} /> : <StatusBadge name={row.original.status.name} color={row.original.status.color} group={row.original.status.group} />) },
-    { id: "amount", accessorKey: "amount", header: "Valor (R$ mm)", size: 110, cell: ({ row }) => <span className="tabular text-xs">{row.original.amount !== null ? formatMM(row.original.amount) : row.original.amountRaw ? <span className="text-muted-foreground">{row.original.amountRaw}</span> : "—"}</span> },
-    { id: "nextAction", accessorKey: "nextAction", header: "Próxima ação", size: 200, enableSorting: false, cell: ({ row }) => (opts.quickEdit ? <NextActionCell id={row.original.id} value={row.original.nextAction} /> : <span className="text-xs truncate block">{row.original.nextAction ?? "—"}</span>) },
-    { id: "nextFollowUpAt", accessorKey: "nextFollowUpAt", header: "Follow-up", size: 105, cell: ({ row }) => (opts.quickEdit ? <FollowUpCell id={row.original.id} value={row.original.nextFollowUpAt} /> : <span className="text-xs tabular">{formatDate(row.original.nextFollowUpAt)}</span>) },
+    { id: "assignees", accessorFn: (r) => r.assignees.map((a) => a.name).join(", "), header: "Responsáveis", size: 104, enableSorting: false, cell: ({ row }) => (opts.quickEdit ? <AssigneesCell id={row.original.id} assignees={row.original.assignees} /> : <AssigneeAvatars users={row.original.assignees} />) },
+    { id: "status", accessorFn: (r) => r.status.name, header: "Status", size: 138, cell: ({ row }) => (opts.quickEdit ? <StatusCell id={row.original.id} status={row.original.status} /> : <StatusBadge name={row.original.status.name} color={row.original.status.color} group={row.original.status.group} />) },
+    { id: "amount", accessorKey: "amount", header: "Valor (R$ mm)", size: 100, cell: ({ row }) => (opts.quickEdit ? <AmountCell id={row.original.id} value={row.original.amount} raw={row.original.amountRaw} /> : <span className="tabular text-xs">{row.original.amount !== null ? formatMM(row.original.amount) : row.original.amountRaw ? <span className="text-muted-foreground">{row.original.amountRaw}</span> : "—"}</span>) },
+    { id: "nextAction", accessorKey: "nextAction", header: "Próxima ação", size: 180, enableSorting: false, cell: ({ row }) => (opts.quickEdit ? <NextActionCell id={row.original.id} value={row.original.nextAction} /> : <span className="text-xs truncate block">{row.original.nextAction ?? "—"}</span>) },
+    { id: "nextFollowUpAt", accessorKey: "nextFollowUpAt", header: "Follow-up", size: 96, cell: ({ row }) => (opts.quickEdit ? <FollowUpCell id={row.original.id} value={row.original.nextFollowUpAt} /> : <span className="text-xs tabular">{formatDate(row.original.nextFollowUpAt)}</span>) },
     { id: "lastActivityAt", accessorKey: "lastActivityAt", header: "Última atividade", size: 110, cell: ({ getValue }) => <span className="tabular text-xs text-muted-foreground">{formatDate(getValue<string | null>())}</span> },
     { id: "updatedAt", accessorKey: "updatedAt", header: "Atualizado", size: 100, cell: ({ getValue }) => <span className="tabular text-xs text-muted-foreground">{formatDate(getValue<string>())}</span> },
     { id: "exitDate", accessorKey: "exitDate", header: "Saída", size: 92, cell: ({ getValue }) => <span className="tabular text-xs">{formatDate(getValue<string | null>())}</span> },
-    { id: "sector", accessorKey: "sector", header: "Setor", size: 120, cell: ({ getValue }) => <span className="text-xs truncate block">{getValue<string | null>() ?? "—"}</span> },
+    { id: "sector", accessorKey: "sector", header: "Setor", size: 120, cell: ({ row }) => (opts.quickEdit ? <TextCell id={row.original.id} field="sector" value={row.original.sector} /> : <span className="text-xs truncate block">{row.original.sector ?? "—"}</span>) },
     { id: "originatorRaw", accessorKey: "originatorRaw", header: "Contato (planilha)", size: 160, enableSorting: false, cell: ({ getValue }) => <span className="text-2xs text-muted-foreground truncate block">{getValue<string | null>() ?? "—"}</span> },
   ];
   if (opts.showReactivate) {
@@ -198,6 +208,7 @@ export function OpportunityTable({ rows, total, page, pageSize, storageKey, quic
       selection={{ selected, onChange: setSelected }}
       exportHref={exportHref}
       columnLabels={OPPORTUNITY_COLUMN_LABELS}
+      stickyColumns={2}
       defaultHidden={defaultHidden ?? ["legacyId", "updatedAt", "exitDate", "sector", "originatorRaw", "lastActivityAt"]}
       toolbarLeft={
         <div className="flex items-center gap-2 flex-wrap">

@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -34,6 +33,8 @@ export interface DataTableProps<T> {
   maxHeight?: string;
   columnLabels?: Record<string, string>;
   defaultHidden?: string[];
+  /** Number of leading visible columns pinned to the left while scrolling horizontally. */
+  stickyColumns?: number;
 }
 
 function loadJSON<T>(key: string, fallback: T): T {
@@ -45,7 +46,7 @@ function loadJSON<T>(key: string, fallback: T): T {
   }
 }
 
-export function DataTable<T>({ columns, data, storageKey, getRowId, onRowClick, sorting, onSortingChange, pagination, selection, toolbarLeft, toolbarRight, exportHref, renderMobileCard, emptyMessage = "Nenhum registro.", dense, maxHeight = "calc(100vh - 260px)", columnLabels = {}, defaultHidden = [] }: DataTableProps<T>) {
+export function DataTable<T>({ columns, data, storageKey, getRowId, onRowClick, sorting, onSortingChange, pagination, selection, toolbarLeft, toolbarRight, exportHref, renderMobileCard, emptyMessage = "Nenhum registro.", dense, maxHeight = "calc(100vh - 260px)", columnLabels = {}, defaultHidden = [], stickyColumns = 0 }: DataTableProps<T>) {
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(() => Object.fromEntries(defaultHidden.map((c) => [c, false])));
   const [columnSizing, setColumnSizing] = React.useState<ColumnSizingState>({});
   const [localSorting, setLocalSorting] = React.useState<SortingState>([]);
@@ -88,6 +89,13 @@ export function DataTable<T>({ columns, data, storageKey, getRowId, onRowClick, 
   });
 
   const totalPages = pagination ? Math.max(1, Math.ceil(pagination.total / pagination.pageSize)) : 1;
+  const visible = table.getVisibleLeafColumns();
+  const stickyStyle = (colId: string): React.CSSProperties => {
+    const idx = visible.findIndex((c) => c.id === colId);
+    if (idx < 0 || idx >= stickyColumns) return {};
+    const left = visible.slice(0, idx).reduce((n, c) => n + c.getSize(), 0);
+    return { position: "sticky", left, zIndex: 2 };
+  };
 
   function copyTable() {
     const visible = table.getVisibleLeafColumns().filter((c) => c.id !== "select");
@@ -179,7 +187,7 @@ export function DataTable<T>({ columns, data, storageKey, getRowId, onRowClick, 
                   const canSort = h.column.getCanSort();
                   const sorted = h.column.getIsSorted();
                   return (
-                    <TableHead key={h.id} style={{ width: h.getSize() }} className="relative select-none group/th">
+                    <TableHead key={h.id} style={{ width: h.getSize(), ...stickyStyle(h.column.id) }} className={cn("relative select-none group/th", stickyStyle(h.column.id).position && "bg-card")}>
                       {h.isPlaceholder ? null : canSort ? (
                         <button className="flex items-center gap-1 w-full text-left hover:text-foreground" onClick={h.column.getToggleSortingHandler()}>
                           <span className="truncate">{flexRender(h.column.columnDef.header, h.getContext())}</span>
@@ -202,7 +210,7 @@ export function DataTable<T>({ columns, data, storageKey, getRowId, onRowClick, 
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() ? "selected" : undefined} className={cn(onRowClick && "cursor-pointer", dense && "[&>td]:py-1")} onClick={() => onRowClick?.(row.original)}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} style={{ width: cell.column.getSize() }} className="overflow-hidden">
+                    <TableCell key={cell.id} style={{ width: cell.column.getSize(), ...stickyStyle(cell.column.id) }} className={cn("overflow-hidden", stickyStyle(cell.column.id).position && "bg-card shadow-[1px_0_0_0_hsl(var(--border))]")}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
@@ -254,10 +262,26 @@ export function DataTable<T>({ columns, data, storageKey, getRowId, onRowClick, 
   );
 }
 
+const NATIVE_CB = "h-4 w-4 cursor-pointer rounded-sm border-input accent-[#0f1411] align-middle";
+
 export function SelectHeader<T>({ table }: { table: import("@tanstack/react-table").Table<T> }) {
-  return <Checkbox checked={table.getIsAllPageRowsSelected() ? true : table.getIsSomePageRowsSelected() ? "indeterminate" : false} onCheckedChange={(v) => table.toggleAllPageRowsSelected(!!v)} aria-label="Selecionar tudo" onClick={(e) => e.stopPropagation()} />;
+  const all = table.getIsAllPageRowsSelected();
+  const some = table.getIsSomePageRowsSelected();
+  return (
+    <input
+      type="checkbox"
+      className={NATIVE_CB}
+      checked={all}
+      ref={(el) => {
+        if (el) el.indeterminate = !all && some;
+      }}
+      onChange={(e) => table.toggleAllPageRowsSelected(e.target.checked)}
+      aria-label="Selecionar tudo"
+      onClick={(e) => e.stopPropagation()}
+    />
+  );
 }
 
 export function SelectCell<T>({ row }: { row: import("@tanstack/react-table").Row<T> }) {
-  return <Checkbox checked={row.getIsSelected()} onCheckedChange={(v) => row.toggleSelected(!!v)} aria-label="Selecionar" onClick={(e) => e.stopPropagation()} />;
+  return <input type="checkbox" className={NATIVE_CB} checked={row.getIsSelected()} onChange={(e) => row.toggleSelected(e.target.checked)} aria-label="Selecionar" onClick={(e) => e.stopPropagation()} />;
 }

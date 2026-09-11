@@ -141,6 +141,7 @@ export function FollowUpCell({ id, value }: { id: string; value: string | null }
       <span>{value ? formatDate(value) : "Agendar"}</span>
       <input
         type="date"
+        suppressHydrationWarning
         className="absolute inset-0 opacity-0 cursor-pointer w-full"
         defaultValue={toDateInput(value)}
         onChange={(e) => {

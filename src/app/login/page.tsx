@@ -8,7 +8,7 @@ export const metadata = { title: "Entrar" };
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ callbackUrl?: string; error?: string }> }) {
   const user = await getSessionUser();
   const sp = await searchParams;
-  if (user) redirect(sp.callbackUrl && sp.callbackUrl.startsWith("/") ? sp.callbackUrl : "/dashboard");
+  if (user) redirect(sp.callbackUrl && sp.callbackUrl.startsWith("/") ? sp.callbackUrl : "/pipeline");
   return (
     <div className="min-h-screen grid lg:grid-cols-[1.1fr_1fr]">
       <div className="hidden lg:flex flex-col justify-between bg-leto-ink text-white p-12 relative overflow-hidden">

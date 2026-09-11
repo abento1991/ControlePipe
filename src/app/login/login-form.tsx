@@ -23,7 +23,7 @@ export function LoginForm({ callbackUrl, initialError }: { callbackUrl?: string;
         setError("E-mail ou senha incorretos.");
         return;
       }
-      router.push(callbackUrl && callbackUrl.startsWith("/") ? callbackUrl : "/dashboard");
+      router.push(callbackUrl && callbackUrl.startsWith("/") ? callbackUrl : "/pipeline");
       router.refresh();
     });
   }

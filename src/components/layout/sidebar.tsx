@@ -8,8 +8,8 @@ import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const NAV = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/pipeline", label: "Pipe Ativo", icon: Kanban },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/on-hold", label: "On Hold / Inativo", icon: PauseCircle },
   { href: "/opportunities", label: "Todas as Oportunidades", icon: Layers },
   { href: "/originators", label: "Originadores", icon: Users },
@@ -28,7 +28,7 @@ const ADMIN = [
 export function Sidebar({ collapsed, onToggle, isAdmin, mobileOpen, onMobileClose }: { collapsed: boolean; onToggle: () => void; isAdmin: boolean; mobileOpen: boolean; onMobileClose: () => void }) {
   const pathname = usePathname();
   const Item = ({ href, label, icon: Icon }: { href: string; label: string; icon: React.ComponentType<{ className?: string }> }) => {
-    const active = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
+    const active = pathname === href || pathname.startsWith(href + "/");
     const link = (
       <Link
         href={href}
@@ -56,7 +56,7 @@ export function Sidebar({ collapsed, onToggle, isAdmin, mobileOpen, onMobileClos
   const content = (
     <div className="flex h-full flex-col">
       <div className={cn("flex items-center h-14 px-4 border-b border-sidebar-border", collapsed && "justify-center px-0")}>
-        <Link href="/dashboard" className="flex items-center gap-2">
+        <Link href="/pipeline" className="flex items-center gap-2">
           {collapsed ? <Image src="/brand/leto-mark.svg" alt="Leto" width={28} height={28} /> : <Image src="/brand/leto-logo.svg" alt="Leto Capital" width={118} height={36} priority />}
         </Link>
         <button onClick={onMobileClose} className="ml-auto lg:hidden text-sidebar-muted hover:text-white">

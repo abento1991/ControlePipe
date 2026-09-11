@@ -1,5 +1,6 @@
 import { PageHeader } from "@/components/common/page-header";
 import { loadListPage, ListView } from "@/components/opportunities/opportunities-list-page";
+import { QuickAddRow } from "@/components/opportunities/quick-add-row";
 import { prisma } from "@/lib/db";
 import { formatMM } from "@/lib/utils";
 import type { SearchParamsLike } from "@/lib/queries/filters";
@@ -14,7 +15,7 @@ export default async function PipelinePage({ searchParams }: { searchParams: Pro
   const overdue = await prisma.opportunity.count({ where: { isDeleted: false, status: { group: "ACTIVE" }, nextFollowUpAt: { lt: new Date() } } });
   return (
     <>
-      <PageHeader title="Pipe Ativo" description="Oportunidades em análise. Edite status, responsáveis, próxima ação e follow-up diretamente na tabela.">
+      <PageHeader title="Pipe Ativo" description="Clique em qualquer célula para editar (nome, tipo, data, originador, responsáveis, status, valor, próxima ação, follow-up). Use a seta ao lado do nome para abrir a página completa da oportunidade.">
         <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <span>
             <span className="font-semibold text-foreground tabular">{agg._count}</span> ativas
@@ -29,6 +30,9 @@ export default async function PipelinePage({ searchParams }: { searchParams: Pro
           )}
         </div>
       </PageHeader>
+      <div className="mb-3">
+        <QuickAddRow />
+      </div>
       <ListView data={data} page="pipeline" storageKey="leto:table:pipeline" quickEdit lockedKeys={["groups"]} show={{ status: true }} exportBase="pipeline" />
     </>
   );
