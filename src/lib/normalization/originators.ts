@@ -176,6 +176,16 @@ function splitPersonName(full: string): { firstName: string; lastName: string | 
 
 export { splitPersonName };
 
+/** Common Brazilian first names — used to decide person vs company when the sheet category is ambiguous. */
+const FIRST_NAMES = new Set(
+  "adriana adriane alberto alex alexandre aline amanda ana andre andrea andreia antonio arthur artur barbara beatriz bernardo bruna bruno caio caique camila carla carlos carolina celso cesar christopher cristiano claudio daniel danilo davi david deyvid diego diogo eduardo elisa emanuel enio erick eric fabio fabiola felipe felippe fernanda fernando flavio francisco frederico gabriel gabriela giovanna guilherme gustavo helena henrique hugo igor isabela ivo jorge jose joao jonatas jorio juan julia juliana julio larissa leandro leonardo leticia lucas luciano luis luiz luiza maiara marcelo marco marcos marcus maria mariana mario mateus matheus mauricio mauro miguel natalia nicolas otavio patricia paulo pedro rafael rafaela raphael renan renato ricardo roberto rodrigo rildo rogerio ronaldo samuel sergio stefano thales thiago thomas tiago vicente victor vinicius vitor vitoria william willian yolanda".split(" "),
+);
+
+function hasFirstName(name: string): boolean {
+  const first = normalizeKey(name).split(" ")[0];
+  return FIRST_NAMES.has(first);
+}
+
 const TITLE_WORDS = /^(cfo|ceo|coo|cto|cro|diretor|diretora|socio|sócio|socia|sócia|assessor|assessora|advogado|advogada|presidente|head|gerente|analista|consultor|consultora|founder|fundador)$/i;
 
 function classifyName(name: string, ctx: OriginatorParseContext): { kind: "person" | "company"; confidence: number; note?: string; category?: CompanyCategoryKey | null } {
@@ -183,11 +193,18 @@ function classifyName(name: string, ctx: OriginatorParseContext): { kind: "perso
   const known = ctx.known?.get(key);
   const tokens = name.trim().split(/\s+/).length;
   const personLike = looksLikePerson(name);
+  if (COMPANY_ALIASES[key]) return { kind: "company", confidence: 0.95, category: known?.category ?? undefined };
   if (known) {
-    if (known.category && personLike && tokens >= 2) {
+    if (known.category && personLike && tokens >= 2 && (hasFirstName(name) || PERSON_CATEGORIES.includes(known.category))) {
+      if (INSTITUTION_CATEGORIES.includes(known.category) && !hasFirstName(name)) {
+        return { kind: "company", confidence: 0.8, note: `Cadastrado na aba Originadores como ${known.typeRaw}`, category: known.category };
+      }
       return { kind: "person", confidence: INSTITUTION_CATEGORIES.includes(known.category) ? 0.7 : 0.9, note: `Cadastrado na aba Originadores como ${known.typeRaw}`, category: known.category };
     }
     if (known.category && personLike && PERSON_CATEGORIES.includes(known.category)) {
+      if (tokens >= 2 && !hasFirstName(name) && known.category === "ESCRITORIO_ADVOCACIA") {
+        return { kind: "company", confidence: 0.7, note: `Cadastrado na aba Originadores como ${known.typeRaw}; nome parece escritório`, category: known.category };
+      }
       return { kind: "person", confidence: 0.85, note: `Cadastrado na aba Originadores como ${known.typeRaw}`, category: known.category };
     }
     if (known.category) {
@@ -237,7 +254,7 @@ export function parseOriginatorCell(raw: string | null | undefined, ctx: Origina
     const a = paren[1].trim();
     const b = paren[2].trim();
     const catB = mapOriginatorCategory(b);
-    if (catB && !ctx.known?.get(normalizeKey(b))) {
+    if (catB && !ctx.known?.get(normalizeKey(b)) && !COMPANY_ALIASES[normalizeKey(b)]) {
       const ca0 = classifyName(a, partCtx);
       if (ca0.kind === "person") return { kind: "person", personName: a, category: catB, confidence: 0.85, needsReview: false, notes: [`Categoria "${b}" indicada entre parênteses`] };
       return { kind: "company", companyName: canonicalCompanyName(a), category: catB, confidence: 0.85, needsReview: false, notes: [`Categoria "${b}" indicada entre parênteses`] };
@@ -245,10 +262,18 @@ export function parseOriginatorCell(raw: string | null | undefined, ctx: Origina
     if (TITLE_WORDS.test(b)) {
       return { kind: "person", personName: a, confidence: 0.8, needsReview: false, notes: [`Cargo "${b}" indicado entre parênteses`], title: b };
     }
-    const ca = classifyName(a, partCtx);
-    const cb = classifyName(b, partCtx);
+    let ca = classifyName(a, partCtx);
+    let cb = classifyName(b, partCtx);
+    // "Vicente Barros (Amavic)": the parenthesised part next to a person name is the company, even when it is a single word.
+    if (ca.kind === "person" && cb.kind === "person") {
+      const ta = a.split(/\s+/).length;
+      if (ta >= 2) cb = { kind: "company", confidence: 0.8, note: "Parte entre parênteses tratada como empresa" };
+      else if (hasFirstName(b) && !hasFirstName(a)) ca = { kind: "company", confidence: 0.7, note: "Nome fora dos parênteses tratado como empresa" };
+      else if (hasFirstName(a)) cb = { kind: "company", confidence: 0.65, note: "Parte entre parênteses tratada como empresa" };
+      else return { kind: "ambiguous", confidence: 0.4, needsReview: true, notes: [`Não foi possível separar "${a}" e "${b}" com segurança`] };
+    }
     if (ca.kind === "person" && cb.kind === "company") {
-      return { kind: "person_and_company", personName: a, companyName: canonicalCompanyName(b), confidence: 0.9, needsReview: false, notes: ["Padrão 'Pessoa (Empresa)'"] };
+      return { kind: "person_and_company", personName: a, companyName: canonicalCompanyName(b), confidence: Math.min(0.9, cb.confidence + 0.1), needsReview: cb.confidence < 0.7, notes: ["Padrão 'Pessoa (Empresa)'", ...(cb.note ? [cb.note] : [])] };
     }
     if (ca.kind === "company" && cb.kind === "person") {
       return { kind: "person_and_company", personName: b, companyName: canonicalCompanyName(a), confidence: 0.85, needsReview: false, notes: ["Padrão 'Empresa (Pessoa)'"] };

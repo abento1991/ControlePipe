@@ -1,8 +1,8 @@
 # Relatório de migração — Acompanhamento do Pipe_20260817.xlsx
 
-- Batch: `cmtwd9vzy000z7do3fady4er6`
+- Batch: `cmtwf3io6000z7dx1ex4quify`
 - SHA-256 do arquivo: `8ad4cfe48c0502fb612cccbac4dba13b9b5f4832da9d001753be28ba78aec917`
-- Gerado em: 2026-09-11T02:58:54.052Z
+- Gerado em: 2026-09-11T03:49:56.175Z
 - Abas lidas: Sheet4, Pipe, Originadores, Analise Originação 2025, Reestruturação, Vertical_1812, Vertical_1610, Vertical_2509, Vertical_2108, Reunião Vertical_1707, Reuniao Vertical_1505, Originação, Output, Reuniao Vertical_old, Sheet2, Sheet1
 
 ## Resumo
@@ -14,11 +14,11 @@
 | Oportunidades atualizadas | 0 |
 | Linhas sem alteração (idempotência) | 0 |
 | Erros | 0 |
-| Empresas criadas | 167 |
-| Contatos criados | 190 |
+| Empresas criadas | 180 |
+| Contatos criados | 185 |
 | Atividades históricas geradas | 4105 |
-| Oportunidades marcadas para revisão manual | 139 |
-| Problemas de qualidade em aberto | 670 |
+| Oportunidades marcadas para revisão manual | 130 |
+| Problemas de qualidade em aberto | 647 |
 
 ## Registros por ano (calculado da data de entrada)
 
@@ -68,9 +68,9 @@
 
 | Código | Descrição | Ocorrências |
 |---|---|---:|
-| COMPANY_UNIDENTIFIED | Pessoa sem empresa identificada | 288 |
+| COMPANY_UNIDENTIFIED | Pessoa sem empresa identificada | 274 |
 | POSSIBLE_DUPLICATE | Possíveis duplicidades | 85 |
-| ORIGINATOR_UNCLASSIFIED | Originador não classificado / ambíguo | 68 |
+| ORIGINATOR_UNCLASSIFIED | Originador não classificado / ambíguo | 59 |
 | ORIGINATOR_MISSING | Originador vazio | 36 |
 | MISSING_NAME | Oportunidades sem nome | 33 |
 | ORIGINATOR_CATEGORY_UNMAPPED | Tipo de contato não mapeado | 33 |
@@ -105,6 +105,7 @@
 - **Cocelpa** — #230, #555
 - **Casa de Saúde Dr. Aragão Villar** — #233, #359
 - **Allonda** — #246, #449, #673
+- **Crédito Pis Cofins** — #714, #716
 - **Allievo** — #273, #330
 - **Sencinet** — #319, #614
 - **Construtora Itau x SANEPAR** — #336, #439
@@ -123,7 +124,6 @@
 - **Zemax** — #627, #782
 - **Minauro x SP** — #692, #842
 - **Cunha vs. Gafisa** — #697, #823
-- **Crédito Pis Cofins** — #714, #716
 - **Telemont** — #734, #812
 - **Usina João de Deus x União (Tese do IAA)** — #763, #813
 - **Construturor QGI x Petrobras** — #894, #895

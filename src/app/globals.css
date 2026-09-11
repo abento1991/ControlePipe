@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Leto light theme — tokens derived from the logo palette */
+    --background: 90 20% 97%;          /* #f6f7f3 */
+    --foreground: 140 14% 8%;          /* #0f1411 */
+    --card: 0 0% 100%;
+    --card-foreground: 140 14% 8%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 140 14% 8%;
+    --primary: 140 14% 8%;             /* ink */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 84 32% 88%;           /* green-light */
+    --secondary-foreground: 84 45% 25%;
+    --accent: 71 39% 54%;              /* leto green #a6b85a */
+    --accent-foreground: 140 14% 8%;
+    --muted: 90 14% 94%;
+    --muted-foreground: 105 5% 42%;    /* stone */
+    --destructive: 0 34% 45%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 90 14% 88%;              /* #e2e5dc */
+    --input: 90 14% 84%;
+    --ring: 71 39% 54%;
+    --radius: 0.5rem;
+    --sidebar: 140 14% 7%;
+    --sidebar-foreground: 90 20% 92%;
+    --sidebar-muted: 100 6% 60%;
+    --sidebar-border: 140 10% 16%;
+    --sidebar-active: 71 39% 54%;
+  }
+  * { @apply border-border; }
+  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  body { @apply bg-background text-foreground font-sans text-sm; }
+  ::selection { background: #a6b85a55; }
+}
+
+@layer utilities {
+  .tabular { font-variant-numeric: tabular-nums; }
+  .scrollbar-thin { scrollbar-width: thin; scrollbar-color: #c9cec2 transparent; }
+  .scrollbar-thin::-webkit-scrollbar { height: 8px; width: 8px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: #c9cec2; border-radius: 8px; }
+  .kpi-number { @apply tabular text-2xl font-semibold tracking-tight; }
+}
+
+/* Presentation mode for charts */
+.presentation-root { background: #ffffff; color: #0f1411; }

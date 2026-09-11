@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 96" fill="none">
+  <!-- Leto Capital wordmark on dark backgrounds (placeholder derived from the logo; replace with the official SVG) -->
+  <path d="M8 36h40l-10 8H8z" fill="#a6b85a"/>
+  <path d="M56 52H16l10-8h30z" fill="#a6b85a"/>
+  <text x="70" y="66" font-family="Inter, Helvetica, Arial, sans-serif" font-size="56" font-weight="600" letter-spacing="-2" fill="#ffffff">leto</text>
+  <text x="192" y="66" font-family="Inter, Helvetica, Arial, sans-serif" font-size="16" font-weight="500" letter-spacing="0.5" fill="#d7dccc">capital</text>
+</svg>

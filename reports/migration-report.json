@@ -1,5 +1,5 @@
 {
-  "batchId": "cmtwd9vzy000z7do3fady4er6",
+  "batchId": "cmtwf3io6000z7dx1ex4quify",
   "fileName": "Acompanhamento do Pipe_20260817.xlsx",
   "fileHash": "8ad4cfe48c0502fb612cccbac4dba13b9b5f4832da9d001753be28ba78aec917",
   "sheets": [
@@ -25,8 +25,8 @@
   "updated": 0,
   "unchanged": 0,
   "errors": 0,
-  "companiesCreated": 167,
-  "contactsCreated": 190,
+  "companiesCreated": 180,
+  "contactsCreated": 185,
   "activitiesCreated": 4105,
   "enrichment": [
     {
@@ -97,12 +97,12 @@
   ],
   "issuesByCode": {
     "TYPE_SPHERE_INFERRED": 22,
-    "COMPANY_UNIDENTIFIED": 288,
+    "COMPANY_UNIDENTIFIED": 274,
     "MISSING_DATE": 19,
     "INVALID_YEAR": 18,
-    "ORIGINATOR_UNCLASSIFIED": 68,
     "TYPE_MISSING": 14,
     "TYPE_UNNORMALIZED": 29,
+    "ORIGINATOR_UNCLASSIFIED": 59,
     "MISSING_NAME": 33,
     "NOT_AN_OPPORTUNITY": 7,
     "ORIGINATOR_MISSING": 36,
@@ -113,7 +113,7 @@
     "ORIGINATOR_CATEGORY_UNMAPPED": 33,
     "POSSIBLE_DUPLICATE": 85
   },
-  "issuesTotal": 670,
+  "issuesTotal": 647,
   "possibleDuplicates": [
     {
       "name": "Elisa Agro",
@@ -247,6 +247,13 @@
       ]
     },
     {
+      "name": "Crédito Pis Cofins",
+      "legacyIds": [
+        714,
+        716
+      ]
+    },
+    {
       "name": "Allievo",
       "legacyIds": [
         273,
@@ -373,13 +380,6 @@
       ]
     },
     {
-      "name": "Crédito Pis Cofins",
-      "legacyIds": [
-        714,
-        716
-      ]
-    },
-    {
       "name": "Telemont",
       "legacyIds": [
         734,
@@ -401,7 +401,7 @@
       ]
     }
   ],
-  "needsReviewOpportunities": 139,
+  "needsReviewOpportunities": 130,
   "unmatchedAux": [
     {
       "sheet": "Analise Originação 2025",
