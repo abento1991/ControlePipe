@@ -25,7 +25,10 @@ async function main() {
       const id = createHash("md5").update(name + Date.now()).digest("hex").slice(0, 8) + "-0000-4000-8000-" + createHash("md5").update(name).digest("hex").slice(0, 12);
       console.log(`[migrate] applying ${name}`);
       await prisma.$transaction(async (tx) => {
-        const statements = sql.split(/;\s*(?:\r?\n|$)/).map((s) => s.trim()).filter((s) => s && !s.startsWith("--"));
+        const statements = sql
+          .split(/;\s*(?:\r?\n|$)/)
+          .map((chunk) => chunk.split(/\r?\n/).filter((line) => !line.trim().startsWith("--")).join("\n").trim())
+          .filter(Boolean);
         for (const st of statements) await tx.$executeRawUnsafe(st);
         await tx.$executeRawUnsafe(`INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, logs, started_at, applied_steps_count) VALUES ($1, $2, now(), $3, NULL, now(), $4)`, id, checksum, name, statements.length);
       });
