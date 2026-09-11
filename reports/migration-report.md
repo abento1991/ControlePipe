@@ -1,8 +1,8 @@
 # Relatório de migração — Acompanhamento do Pipe_20260817.xlsx
 
-- Batch: `cmtwf3io6000z7dx1ex4quify`
+- Batch: `cmtwzwnz1000z7dao1z0r2fo4`
 - SHA-256 do arquivo: `8ad4cfe48c0502fb612cccbac4dba13b9b5f4832da9d001753be28ba78aec917`
-- Gerado em: 2026-09-11T03:49:56.175Z
+- Gerado em: 2026-09-11T13:32:16.686Z
 - Abas lidas: Sheet4, Pipe, Originadores, Analise Originação 2025, Reestruturação, Vertical_1812, Vertical_1610, Vertical_2509, Vertical_2108, Reunião Vertical_1707, Reuniao Vertical_1505, Originação, Output, Reuniao Vertical_old, Sheet2, Sheet1
 
 ## Resumo
@@ -10,13 +10,13 @@
 | Métrica | Valor |
 |---|---:|
 | Linhas na aba Pipe | 903 |
-| Oportunidades criadas | 903 |
+| Oportunidades criadas | 0 |
 | Oportunidades atualizadas | 0 |
-| Linhas sem alteração (idempotência) | 0 |
+| Linhas sem alteração (idempotência) | 903 |
 | Erros | 0 |
-| Empresas criadas | 180 |
-| Contatos criados | 185 |
-| Atividades históricas geradas | 4105 |
+| Empresas criadas | 0 |
+| Contatos criados | 0 |
+| Atividades históricas geradas | 593 |
 | Oportunidades marcadas para revisão manual | 130 |
 | Problemas de qualidade em aberto | 647 |
 
@@ -68,27 +68,11 @@
 
 | Código | Descrição | Ocorrências |
 |---|---|---:|
-| COMPANY_UNIDENTIFIED | Pessoa sem empresa identificada | 274 |
 | POSSIBLE_DUPLICATE | Possíveis duplicidades | 85 |
-| ORIGINATOR_UNCLASSIFIED | Originador não classificado / ambíguo | 59 |
-| ORIGINATOR_MISSING | Originador vazio | 36 |
-| MISSING_NAME | Oportunidades sem nome | 33 |
-| ORIGINATOR_CATEGORY_UNMAPPED | Tipo de contato não mapeado | 33 |
-| TYPE_UNNORMALIZED | Tipo de operação com mapeamento incerto | 29 |
-| TYPE_SPHERE_INFERRED | Esfera de precatório inferida pelo nome | 22 |
-| MISSING_DATE | Oportunidades sem data de entrada | 19 |
-| INVALID_YEAR | Coluna year inválida (1900 / #VALUE!) | 18 |
-| TYPE_MISSING | Tipo de operação vazio | 14 |
-| EXIT_BEFORE_ENTRY | Data de saída anterior à entrada | 10 |
-| NOT_AN_OPPORTUNITY | Linhas que não são oportunidades (tarefas internas) | 7 |
-| AMOUNT_NOT_NUMERIC | Valor não numérico (TBD, faixas) | 3 |
-| ASSIGNEE_UNMAPPED | Responsável legado não mapeado | 2 |
-| STATUS_UNNORMALIZED | Status/decisão não normalizado | 2 |
 
 ## Possíveis duplicidades na aba Pipe (não mescladas)
 
 - **Elisa Agro** — #32, #281, #671
-- **Aspometron** — #44, #117, #287
 - **OI** — #83, #234, #374
 - **IRGOVEL** — #203, #217
 - **Brandili** — #90, #414
@@ -97,6 +81,7 @@
 - **Camargo Correa** — #103, #182
 - **Sequoia** — #104, #136
 - **Leilão do Itau** — #105, #119, #343
+- **Aspometron** — #44, #117, #287
 - **Minter** — #123, #263
 - **São Paulo** — #125, #290
 - **Precatório** — #157, #168
@@ -107,23 +92,23 @@
 - **Allonda** — #246, #449, #673
 - **Crédito Pis Cofins** — #714, #716
 - **Allievo** — #273, #330
-- **Sencinet** — #319, #614
 - **Construtora Itau x SANEPAR** — #336, #439
 - **Casas Bahia** — #339, #617
-- **Grupo Monte Alegre** — #350, #639
 - **Patense** — #356, #642
 - **Precatório Fortaleza** — #381, #625
 - **Precatório Paraná** — #387, #896
 - **Packem** — #418, #685
 - **Precatório de Alagoas** — #436, #814
 - **Casal x Fazenda Nacional** — #446, #523
-- **Eletrodata** — #453, #720
 - **Cara Preta** — #491, #568
 - **CTR Itaboraí x Itaboraí** — #513, #514
 - **Tomé Carlos x  Instituto Chico Mendes (ICMBio)** — #571, #794
+- **Sencinet** — #319, #614
 - **Zemax** — #627, #782
+- **Grupo Monte Alegre** — #350, #639
 - **Minauro x SP** — #692, #842
 - **Cunha vs. Gafisa** — #697, #823
+- **Eletrodata** — #453, #720
 - **Telemont** — #734, #812
 - **Usina João de Deus x União (Tese do IAA)** — #763, #813
 - **Construturor QGI x Petrobras** — #894, #895
@@ -160,54 +145,51 @@ Tokens não mapeados (preservados em `assigneesRaw`, sinalizados em Data Quality
 | Precatórios | precatorio-nao-identificado | 90% |  | 14 |
 | Ação Judicial | legal-claim | 90% |  | 12 |
 | Precatório | precatorio-nao-identificado | 90% |  | 11 |
-| Precatorio Municipal | precatorio-municipal | 100% |  | 9 |
 | Litigation Finance | litigation-finance | 100% |  | 9 |
+| Precatorio Municipal | precatorio-municipal | 100% |  | 9 |
 | Legal Claims | legal-claim | 90% |  | 9 |
 | Precatorio Estadual | precatorio-estadual | 100% |  | 8 |
 | Direito Creditórios | direitos-creditorios | 90% |  | 8 |
 | Crédito para Operação | credito-estruturado | 80% |  | 7 |
 | Precatorio Federal | precatorio-federal | 100% |  | 7 |
 | Falência | falencia-distressed | 90% |  | 7 |
-| DIP para RJ | dip-exit-financing | 95% |  | 5 |
-| Credito | credito-estruturado | 90% |  | 5 |
 | Antecipação de Recebíveis | antecipacao-recebiveis | 100% |  | 5 |
-| Debenture | titulos-de-credito | 90% |  | 4 |
+| Credito | credito-estruturado | 90% |  | 5 |
+| DIP para RJ | dip-exit-financing | 95% |  | 5 |
+| Pré Precatorio | pre-precatorio | 90% |  | 4 |
+| Pré Precatório Municipal | pre-precatorio-municipal | 95% |  | 4 |
 | Direitos Creditórios | direitos-creditorios | 100% |  | 4 |
 | Precatorios | precatorio-nao-identificado | 90% |  | 4 |
-| Pré precatório | pre-precatorio | 90% |  | 4 |
-| Pré Precatorio | pre-precatorio | 90% |  | 4 |
-| Pre precatorio | pre-precatorio | 90% |  | 4 |
 | Precatorio federal | precatorio-federal | 100% |  | 4 |
-| Pré Precatório Municipal | pre-precatorio-municipal | 95% |  | 4 |
-| Leilão | direitos-creditorios | 60% | sim | 3 |
-| Crédito para RJ | dip-exit-financing | 95% |  | 3 |
-| Precatorio | precatorio-nao-identificado | 90% |  | 3 |
+| Pre precatorio | pre-precatorio | 90% |  | 4 |
+| Debenture | titulos-de-credito | 90% |  | 4 |
+| Pré precatório | pre-precatorio | 90% |  | 4 |
+| Pré-precatório Federal | pre-precatorio-federal | 100% |  | 3 |
 | Legal claim | legal-claim | 100% |  | 3 |
 | Credito para RJ | dip-exit-financing | 95% |  | 3 |
-| Pré-precatório Federal | pre-precatorio-federal | 100% |  | 3 |
+| Leilão | direitos-creditorios | 60% | sim | 3 |
+| CRA | titulos-de-credito | 90% |  | 3 |
+| Precatorio | precatorio-nao-identificado | 90% |  | 3 |
 | FIDC | fidc | 100% |  | 3 |
 | Pré precatório Estadual | pre-precatorio-estadual | 95% |  | 3 |
-| CRA | titulos-de-credito | 90% |  | 3 |
-| Claims | legal-claim | 90% |  | 2 |
-| Compra de NPL | npl | 95% |  | 2 |
-| Pre precatório Federal | pre-precatorio-federal | 95% |  | 2 |
-| Oportunidade de Crédito estressado | credito-estruturado | 80% |  | 2 |
-| Crédito RJ | dip-exit-financing | 95% |  | 2 |
-| Capital de Giro | credito-estruturado | 80% |  | 2 |
-| Tunepe | legal-claim | 60% | sim | 2 |
+| Crédito para RJ | dip-exit-financing | 95% |  | 3 |
 | Precatorio TO | precatorio-estadual | 90% |  | 2 |
-| Precatorio do Rio de Janeiro | precatorio-estadual | 90% |  | 2 |
 | Pre Precatorio Federal | pre-precatorio-federal | 95% |  | 2 |
-| Claim | legal-claim | 90% |  | 2 |
+| Pre precatório Federal | pre-precatorio-federal | 95% |  | 2 |
+| Crédito RJ | dip-exit-financing | 95% |  | 2 |
 | Carteira de Crédito | npl | 75% |  | 2 |
 | Precatórios Estaduais | precatorio-estadual | 90% |  | 2 |
-| Leilao Single Names ITAÚ | npl | 95% |  | 1 |
-| Honorário Advocatício Data Traffic | legal-claim | 90% |  | 1 |
+| Oportunidade de Crédito estressado | credito-estruturado | 80% |  | 2 |
+| Claims | legal-claim | 90% |  | 2 |
+| Claim | legal-claim | 90% |  | 2 |
+| Precatorio do Rio de Janeiro | precatorio-estadual | 90% |  | 2 |
+| Tunepe | legal-claim | 60% | sim | 2 |
+| Compra de NPL | npl | 95% |  | 2 |
+| Capital de Giro | credito-estruturado | 80% |  | 2 |
 | Ação Judicial x Transnordestina | legal-claim | 90% |  | 1 |
 | Crédito para empresa em distress | credito-estruturado | 80% |  | 1 |
 | Gazeta Mercantil | outros | 20% | sim | 1 |
 | Honorários Advocatícios | legal-claim | 90% |  | 1 |
-| Crédito para Empresa | credito-estruturado | 80% |  | 1 |
 | Credito tributario ICMS | direitos-creditorios | 80% |  | 1 |
 | Compra de créditos de RJ | dip-exit-financing | 95% |  | 1 |
 | Financiamento imobiliário | credito-estruturado | 70% |  | 1 |
@@ -217,8 +199,6 @@ Tokens não mapeados (preservados em `assigneesRaw`, sinalizados em Data Quality
 | Ativos para Monetização | outros | 50% | sim | 1 |
 | Ação contra o estado do Pará | legal-claim | 90% |  | 1 |
 | Precatorio Municipal do RJ | precatorio-municipal | 95% |  | 1 |
-| Massa Falida | falencia-distressed | 90% |  | 1 |
-| Crédito para compra de participação em empresa | credito-estruturado | 80% |  | 1 |
 | TECHNION | outros | 20% | sim | 1 |
 | Alongamento de Dívida | credito-estruturado | 80% |  | 1 |
 | Precatorio Estadual RJ | precatorio-estadual | 90% |  | 1 |
@@ -256,6 +236,11 @@ Tokens não mapeados (preservados em `assigneesRaw`, sinalizados em Data Quality
 | Carteira de crédito | npl | 75% |  | 1 |
 | Carteira de Ativos | outros | 50% | sim | 1 |
 | Pré Precatório | pre-precatorio | 90% |  | 1 |
+| Pre precatorio Municipal - Feira de Santana | pre-precatorio-municipal | 95% |  | 1 |
+| Carteira de recebíveis | npl | 75% |  | 1 |
+| Crédito para Empresa | credito-estruturado | 80% |  | 1 |
+| Massa Falida | falencia-distressed | 90% |  | 1 |
+| Crédito para compra de participação em empresa | credito-estruturado | 80% |  | 1 |
 | Crédito ICMS | direitos-creditorios | 80% |  | 1 |
 | Arbitragem | legal-claim | 90% |  | 1 |
 | Precatórios Municipais | precatorio-municipal | 95% |  | 1 |
@@ -302,8 +287,6 @@ Tokens não mapeados (preservados em `assigneesRaw`, sinalizados em Data Quality
 | NPL do Itau | npl | 95% |  | 1 |
 | Compra de Créditos do CS | direitos-creditorios | 60% | sim | 1 |
 | Ativos Judiciais | legal-claim | 90% |  | 1 |
-| Pre precatorio Municipal - Feira de Santana | pre-precatorio-municipal | 95% |  | 1 |
-| Carteira de recebíveis | npl | 75% |  | 1 |
 | Precatório Paraná | precatorio-estadual | 90% |  | 1 |
 | Compra de CRI | titulos-de-credito | 90% |  | 1 |
 | Imóveis em Leilão | outros | 60% | sim | 1 |
@@ -326,6 +309,8 @@ Tokens não mapeados (preservados em `assigneesRaw`, sinalizados em Data Quality
 | Venda de Carteira de Recebíveis Agro | npl | 75% |  | 1 |
 | FIDC Auto BV | fidc | 95% |  | 1 |
 | Precatorio estadual RJ | precatorio-estadual | 90% |  | 1 |
+| Leilao Single Names ITAÚ | npl | 95% |  | 1 |
+| Honorário Advocatício Data Traffic | legal-claim | 90% |  | 1 |
 
 ## Reconciliação com abas auxiliares
 
@@ -333,9 +318,9 @@ Abas auxiliares nunca criam oportunidades: só enriquecem registros já existent
 
 | Aba | Linhas | Casadas com Pipe | Sem correspondência | Enriquecimentos aplicados |
 |---|---:|---:|---:|---:|
-| Analise Originação 2025 | 372 | 366 | 6 | 6 |
-| Originação | 257 | 236 | 21 | 15 |
-| Output | 67 | 66 | 1 | 56 |
+| Analise Originação 2025 | 372 | 366 | 6 | 0 |
+| Originação | 257 | 236 | 21 | 0 |
+| Output | 67 | 66 | 1 | 54 |
 
 | Aba de reunião vertical | Linhas | Casadas | Sem correspondência |
 |---|---:|---:|---:|
