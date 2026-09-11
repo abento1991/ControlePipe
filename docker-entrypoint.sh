@@ -10,10 +10,11 @@ if [ -z "$AUTH_SECRET" ]; then
   exit 1
 fi
 export AUTH_TRUST_HOST="${AUTH_TRUST_HOST:-true}"
-if [ -z "$SEED_DEFAULT_PASSWORD" ]; then
-  export SEED_DEFAULT_PASSWORD="leto2026"
-  echo "[leto] WARNING: SEED_DEFAULT_PASSWORD not set — team users get the default password 'leto2026'. Change it in Administração → Usuários."
+if [ -z "$APP_PASSWORD" ] && [ -z "$SEED_DEFAULT_PASSWORD" ]; then
+  echo "[leto] ERROR: set APP_PASSWORD (single strong team password for the login screen) or SEED_DEFAULT_PASSWORD (per-user passwords)." >&2
+  exit 1
 fi
+if [ -n "$APP_PASSWORD" ]; then echo "[leto] access mode: shared team password (APP_PASSWORD)"; fi
 if [ -z "$AUTH_URL" ] && [ -n "$RAILWAY_PUBLIC_DOMAIN" ]; then export AUTH_URL="https://$RAILWAY_PUBLIC_DOMAIN"; fi
 if [ -z "$AUTH_URL" ] && [ -n "$RENDER_EXTERNAL_URL" ]; then export AUTH_URL="$RENDER_EXTERNAL_URL"; fi
 

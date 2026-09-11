@@ -140,7 +140,8 @@ PostgreSQL + Prisma. Entidades principais (ver `prisma/schema.prisma`):
 | `AUTH_SECRET` | segredo do Auth.js (`openssl rand -base64 32`) |
 | `AUTH_URL` | URL pública da aplicação |
 | `AUTH_TRUST_HOST` | `true` atrás de proxies/Vercel |
-| `SEED_DEFAULT_PASSWORD` | senha inicial usada pelo seed para os 4 usuários (troque depois) |
+| `APP_PASSWORD` | **senha única de acesso** da equipe (modo recomendado para começar): a tela de login pede só essa senha; opcionalmente a pessoa marca seu nome para atribuição das ações (senão fica como "Equipe Leto") |
+| `SEED_DEFAULT_PASSWORD` | senha inicial por usuário (modo alternativo, e-mail + senha individual) |
 | `PIPELINE_WORKBOOK` | caminho da planilha usado por `npm run import:pipeline` |
 
 Nenhuma senha é armazenada em código. `.env` está no `.gitignore`; use `.env.example` como modelo.

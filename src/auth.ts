@@ -30,7 +30,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       async authorize(credentials) {
         const email = String(credentials?.email ?? "").trim().toLowerCase();
         const password = String(credentials?.password ?? "");
-        if (!email || !password) return null;
+        if (!password) return null;
+        const appPassword = process.env.APP_PASSWORD;
+        // Shared team password (APP_PASSWORD): one password for everyone; the person is chosen on the login screen
+        // (defaults to the shared "Equipe Leto" user). Per-user bcrypt passwords still work when set.
+        if (appPassword && password === appPassword) {
+          const chosen = email ? await prisma.user.findUnique({ where: { email } }) : null;
+          const user = chosen && chosen.isActive && !chosen.isArchived ? chosen : await prisma.user.findFirst({ where: { email: "equipe@letocapital.com.br" } });
+          if (!user) return null;
+          return { id: user.id, name: user.name, email: user.email, role: user.role, initials: user.initials ?? undefined, color: user.color };
+        }
+        if (!email) return null;
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user || !user.passwordHash || !user.isActive || user.isArchived) return null;
         const ok = await bcrypt.compare(password, user.passwordHash);

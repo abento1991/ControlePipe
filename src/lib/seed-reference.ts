@@ -32,7 +32,7 @@ export async function seedReferenceData(prisma: PrismaClient, opts: { passwordHa
         data: {
           name: m.name,
           email: m.email,
-          role: m.key === "antonio" ? "ADMIN" : "USER",
+          role: m.key === "antonio" || m.key === "equipe" ? "ADMIN" : "USER",
           isArchived: m.isArchived,
           isActive: !m.isArchived,
           color: m.color,
