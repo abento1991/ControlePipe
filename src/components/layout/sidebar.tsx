@@ -57,7 +57,7 @@ export function Sidebar({ collapsed, onToggle, isAdmin, mobileOpen, onMobileClos
     <div className="flex h-full flex-col">
       <div className={cn("flex items-center h-14 px-4 border-b border-sidebar-border", collapsed && "justify-center px-0")}>
         <Link href="/pipeline" className="flex items-center gap-2">
-          {collapsed ? <Image src="/brand/leto-mark.svg" alt="Leto" width={28} height={28} /> : <Image src="/brand/leto-logo.svg" alt="Leto Capital" width={118} height={36} priority />}
+          {collapsed ? <Image src="/brand/leto-mark.svg" alt="Leto" width={28} height={28} /> : <Image src="/brand/leto-logo.svg" alt="Leto Capital" width={116} height={37} priority />}
         </Link>
         <button onClick={onMobileClose} className="ml-auto lg:hidden text-sidebar-muted hover:text-white">
           <X className="h-4 w-4" />

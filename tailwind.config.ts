@@ -2,10 +2,11 @@ import type { Config } from "tailwindcss";
 import animate from "tailwindcss-animate";
 
 /**
- * Leto Capital palette — derived from the logo: near-black ground, white wordmark and the olive/lime accent mark.
- * primary  = ink (near-black, slightly green-tinted)   → sidebar, headings, primary buttons
- * accent   = leto green (olive/lime)                   → highlights, active states, key metrics
- * background = warm off-white with a hint of green     → page ground
+ * Leto Capital palette — taken from the brand assets: black ground, white wordmark and the lime mark (#bfdf85).
+ * primary  = ink (black)                       → sidebar, headings, primary buttons
+ * accent   = leto lime                         → highlights, active states, key metrics (black text on top)
+ * green-deep = darker lime for text on light   → eyebrows, links, positive numbers
+ * background = off-white with a hint of lime   → page ground
  */
 const config: Config = {
   darkMode: ["class"],
@@ -28,18 +29,19 @@ const config: Config = {
         popover: { DEFAULT: "hsl(var(--popover))", foreground: "hsl(var(--popover-foreground))" },
         sidebar: { DEFAULT: "hsl(var(--sidebar))", foreground: "hsl(var(--sidebar-foreground))", muted: "hsl(var(--sidebar-muted))", border: "hsl(var(--sidebar-border))", active: "hsl(var(--sidebar-active))" },
         leto: {
-          ink: "#0f1411",
-          ink2: "#1b221d",
-          green: "#a6b85a",
-          "green-dark": "#7f9140",
-          "green-deep": "#5c7a2e",
-          "green-light": "#e9eed4",
-          "green-faint": "#f3f6e8",
-          stone: "#6b7266",
-          sand: "#f6f7f3",
-          line: "#e2e5dc",
+          ink: "#050505",
+          ink2: "#161616",
+          green: "#bfdf85",
+          "green-pale": "#c9eda2",
+          "green-dark": "#9cc45a",
+          "green-deep": "#587f28",
+          "green-light": "#e3f2c8",
+          "green-faint": "#f2f8e6",
+          stone: "#6b6f66",
+          sand: "#f7f8f4",
+          line: "#e3e6de",
         },
-        success: "#4f7d2a",
+        success: "#587f28",
         warning: "#c99a3b",
         danger: "#9a4b4b",
         info: "#3b6b8f",
@@ -51,8 +53,8 @@ const config: Config = {
       },
       fontSize: { "2xs": ["0.6875rem", { lineHeight: "1rem" }] },
       boxShadow: {
-        card: "0 1px 2px rgba(15,20,17,0.04), 0 1px 3px rgba(15,20,17,0.06)",
-        pop: "0 8px 24px rgba(15,20,17,0.12)",
+        card: "0 1px 2px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.06)",
+        pop: "0 8px 24px rgba(0,0,0,0.14)",
       },
       keyframes: {
         "accordion-down": { from: { height: "0" }, to: { height: "var(--radix-accordion-content-height)" } },

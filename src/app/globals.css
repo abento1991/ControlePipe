@@ -5,40 +5,47 @@
 @layer base {
   :root {
     /* Leto light theme — tokens derived from the logo palette */
-    --background: 90 20% 97%;          /* #f6f7f3 */
-    --foreground: 140 14% 8%;          /* #0f1411 */
+    --background: 84 24% 97%;          /* #f5f8f0 */
+    --foreground: 0 0% 2%;             /* #050505 */
     --card: 0 0% 100%;
-    --card-foreground: 140 14% 8%;
+    --card-foreground: 0 0% 2%;
     --popover: 0 0% 100%;
-    --popover-foreground: 140 14% 8%;
-    --primary: 140 14% 8%;             /* ink */
+    --popover-foreground: 0 0% 2%;
+    --primary: 0 0% 2%;                /* ink */
     --primary-foreground: 0 0% 100%;
-    --secondary: 84 32% 88%;           /* green-light */
-    --secondary-foreground: 84 45% 25%;
-    --accent: 71 39% 54%;              /* leto green #a6b85a */
-    --accent-foreground: 140 14% 8%;
+    --secondary: 86 62% 87%;           /* green-light #e3f2c8 */
+    --secondary-foreground: 87 52% 33%;
+    --accent: 81 58% 70%;              /* leto lime #bfdf85 */
+    --accent-foreground: 0 0% 2%;
     --muted: 90 14% 94%;
-    --muted-foreground: 105 5% 42%;    /* stone */
+    --muted-foreground: 100 4% 42%;    /* stone */
     --destructive: 0 34% 45%;
     --destructive-foreground: 0 0% 100%;
     --border: 90 14% 88%;              /* #e2e5dc */
     --input: 90 14% 84%;
-    --ring: 71 39% 54%;
+    --ring: 82 50% 55%;
     --radius: 0.5rem;
-    --sidebar: 140 14% 7%;
-    --sidebar-foreground: 90 20% 92%;
-    --sidebar-muted: 100 6% 60%;
-    --sidebar-border: 140 10% 16%;
-    --sidebar-active: 71 39% 54%;
+    --sidebar: 0 0% 0%;
+    --sidebar-foreground: 0 0% 94%;
+    --sidebar-muted: 0 0% 62%;
+    --sidebar-border: 0 0% 13%;
+    --sidebar-active: 81 58% 70%;
   }
   * { @apply border-border; }
   html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
   body { @apply bg-background text-foreground font-sans text-sm; }
-  ::selection { background: #a6b85a55; }
+  ::selection { background: #bfdf8599; }
 }
 
 @layer utilities {
   .tabular { font-variant-numeric: tabular-nums; }
+  /* Lime dot grid from the brand banner, fading out to the right. */
+  .brand-dots {
+    background-image: radial-gradient(circle, rgba(191, 223, 133, 0.55) 1.2px, transparent 1.6px);
+    background-size: 22px 22px;
+    -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0.9), rgba(0,0,0,0.35) 45%, transparent 80%);
+    mask-image: linear-gradient(to right, rgba(0,0,0,0.9), rgba(0,0,0,0.35) 45%, transparent 80%);
+  }
   .scrollbar-thin { scrollbar-width: thin; scrollbar-color: #c9cec2 transparent; }
   .scrollbar-thin::-webkit-scrollbar { height: 8px; width: 8px; }
   .scrollbar-thin::-webkit-scrollbar-thumb { background: #c9cec2; border-radius: 8px; }
@@ -46,4 +53,4 @@
 }
 
 /* Presentation mode for charts */
-.presentation-root { background: #ffffff; color: #0f1411; }
+.presentation-root { background: #ffffff; color: #050505; }

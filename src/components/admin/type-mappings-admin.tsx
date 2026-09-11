@@ -186,7 +186,7 @@ export function TypeMappingsAdmin({ mappings, types }: { mappings: MappingRow[];
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label>Cor</Label>
-                <Input name="color" type="color" defaultValue={editType?.color ?? "#5c7a2e"} className="h-9 p-1" />
+                <Input name="color" type="color" defaultValue={editType?.color ?? "#587f28"} className="h-9 p-1" />
               </div>
               {editType && (
                 <label className="flex items-center gap-2 text-xs pt-5">

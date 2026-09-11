@@ -1,5 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
-<!-- Leto Capital mark -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<!-- Leto Capital app icon: mark on black rounded square -->
+<rect width="512" height="512" rx="96" fill="#000"/>
 <g fill="#bfdf85" transform="translate(0 0) scale(1.0)"><path d="M305 110h53v45h-53z"/>
 <path d="M75 200h249l-41 55H75z"/>
 <path d="M230 255h207v55H189z"/>

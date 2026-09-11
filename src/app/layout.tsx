@@ -6,7 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 export const metadata: Metadata = {
   title: { default: "Leto Pipeline", template: "%s · Leto Pipeline" },
   description: "Origination & Opportunities CRM — Leto Capital Special Situations",
-  icons: { icon: "/brand/leto-mark.svg" },
+  icons: { icon: "/brand/leto-icon.svg", apple: "/brand/leto-icon.svg" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

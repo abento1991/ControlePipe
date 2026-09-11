@@ -96,7 +96,7 @@ export async function upsertUser(id: string | null, input: z.input<typeof userSc
       return ok({ id });
     }
     if (!passwordHash) return fail("Defina uma senha inicial.");
-    const u = await prisma.user.create({ data: { name: d.name, email: d.email, role: d.role, initials: initialsOf(d.name), color: d.color || "#5c7a2e", passwordHash } });
+    const u = await prisma.user.create({ data: { name: d.name, email: d.email, role: d.role, initials: initialsOf(d.name), color: d.color || "#587f28", passwordHash } });
     await logAudit(null, { entity: "User", entityId: u.id, action: "create", userId: admin.id, changes: [{ field: "email", oldValue: null, newValue: d.email }] });
     revalidatePath("/admin/users");
     return ok({ id: u.id });

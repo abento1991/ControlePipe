@@ -1,7 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 96" fill="none">
-  <!-- Leto Capital wordmark on dark backgrounds (placeholder derived from the logo; replace with the official SVG) -->
-  <path d="M8 36h40l-10 8H8z" fill="#a6b85a"/>
-  <path d="M56 52H16l10-8h30z" fill="#a6b85a"/>
-  <text x="70" y="66" font-family="Inter, Helvetica, Arial, sans-serif" font-size="56" font-weight="600" letter-spacing="-2" fill="#ffffff">leto</text>
-  <text x="192" y="66" font-family="Inter, Helvetica, Arial, sans-serif" font-size="16" font-weight="500" letter-spacing="0.5" fill="#d7dccc">capital</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 96" fill="none">
+<!-- Leto Capital wordmark (dark backgrounds) -->
+<g fill="#bfdf85" transform="translate(0 18) scale(0.109375)"><path d="M305 110h53v45h-53z"/>
+<path d="M75 200h249l-41 55H75z"/>
+<path d="M230 255h207v55H189z"/>
+<path d="M305 155h53L208 355h-53z"/>
+<path d="M155 355h53v45h-53z"/></g>
+<g fill="none" stroke="#ffffff" stroke-width="11" stroke-linejoin="round">
+<path d="M62 8v70"/>
+<path d="M76 53h48"/><path d="M124 53a24 24 0 1 0-7 17"/>
+<path d="M142 12v50a16 16 0 0 0 16 16h4"/><path d="M128 30h30"/>
+<circle cx="198" cy="53" r="24"/>
+</g>
+<text x="236" y="61" font-family="Inter, Helvetica, Arial, sans-serif" font-size="14" font-weight="500" letter-spacing="0.2" fill="#ffffff">capital</text>
 </svg>

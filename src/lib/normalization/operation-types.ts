@@ -26,7 +26,7 @@ export interface OperationTypeDefinition {
 }
 
 export const OPERATION_TYPE_DEFINITIONS: OperationTypeDefinition[] = [
-  { slug: "credito-estruturado", name: "Crédito Estruturado", category: "CREDITO_ESTRUTURADO", color: "#5c7a2e", sortOrder: 10 },
+  { slug: "credito-estruturado", name: "Crédito Estruturado", category: "CREDITO_ESTRUTURADO", color: "#587f28", sortOrder: 10 },
   { slug: "titulos-de-credito", name: "Títulos de Crédito (Debêntures / CRA / CRI)", category: "CREDITO_ESTRUTURADO", color: "#7b9a45", sortOrder: 15 },
   { slug: "dip-exit-financing", name: "DIP / Exit Financing", category: "DIP_EXIT_FINANCING", color: "#3b6b8f", sortOrder: 20 },
   { slug: "npl", name: "NPL", category: "NPL", color: "#8f5a3b", sortOrder: 30 },

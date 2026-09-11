@@ -146,7 +146,7 @@ export function UsersAdmin({ users, currentUserId }: { users: UserRow[]; current
               </div>
               <div className="space-y-1.5">
                 <Label>Cor do avatar</Label>
-                <Input name="color" type="color" defaultValue={row?.color ?? "#5c7a2e"} className="h-9 p-1" />
+                <Input name="color" type="color" defaultValue={row?.color ?? "#587f28"} className="h-9 p-1" />
               </div>
             </div>
             <div className="space-y-1.5">

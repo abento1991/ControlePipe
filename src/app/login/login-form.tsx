@@ -84,7 +84,7 @@ export function LoginForm({ callbackUrl, initialError, users, shared }: { callba
         picker
       )}
       {error && <p className="text-xs text-danger">{error}</p>}
-      <Button type="submit" className="w-full" disabled={pending || (!shared && !useEmail && !selected)}>
+      <Button type="submit" variant="accent" className="w-full font-semibold" disabled={pending || (!shared && !useEmail && !selected)}>
         {pending && <Loader2 className="animate-spin" />}
         Entrar
       </Button>

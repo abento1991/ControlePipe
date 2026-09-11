@@ -108,7 +108,7 @@ export function ChartCard({ title, description, period, children, highlights, cl
                 <h2 className="text-2xl font-semibold tracking-tight text-leto-ink">{title}</h2>
                 {(description || period) && <p className="text-sm text-leto-stone mt-1">{[description, period].filter(Boolean).join(" · ")}</p>}
               </div>
-              <Image src="/brand/leto-logo-dark.svg" alt="Leto Capital" width={130} height={40} />
+              <Image src="/brand/leto-logo-dark.svg" alt="Leto Capital" width={125} height={40} />
             </div>
             <div className="flex-1 grid gap-8 mt-6" style={{ gridTemplateColumns: highlights?.length ? "1fr 220px" : "1fr" }}>
               <div className="min-h-0">{children}</div>
