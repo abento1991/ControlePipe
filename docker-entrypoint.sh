@@ -1,41 +1,56 @@
 #!/bin/sh
-# Boot: check env → migrate → start the web server (port opens immediately) → seed + import in the background.
-set -e
-if [ -z "$DATABASE_URL" ]; then
-  echo "[leto] ERROR: DATABASE_URL is not set. Add a PostgreSQL service and set DATABASE_URL (Railway: \${{Postgres.DATABASE_URL}})." >&2
-  exit 1
-fi
-if [ -z "$AUTH_SECRET" ]; then
-  echo "[leto] ERROR: AUTH_SECRET is not set. Generate one with: openssl rand -base64 32" >&2
-  exit 1
-fi
+# Boot order: env checks → start web server immediately (port 3000 opens in ~1s) → migrate + seed + import in background.
+# Progress is appended to bootstrap.log and exposed at /api/health for remote diagnosis.
+LOG=/app/bootstrap.log
+: > "$LOG"
+log() { echo "[leto] $*" | tee -a "$LOG"; }
+
+export PORT="${PORT:-3000}"
+export HOSTNAME=0.0.0.0
 export AUTH_TRUST_HOST="${AUTH_TRUST_HOST:-true}"
-if [ -z "$APP_PASSWORD" ] && [ -z "$SEED_DEFAULT_PASSWORD" ]; then
-  echo "[leto] ERROR: set APP_PASSWORD (single strong team password for the login screen) or SEED_DEFAULT_PASSWORD (per-user passwords)." >&2
-  exit 1
-fi
-if [ -n "$APP_PASSWORD" ]; then echo "[leto] access mode: shared team password (APP_PASSWORD)"; fi
 if [ -z "$AUTH_URL" ] && [ -n "$RAILWAY_PUBLIC_DOMAIN" ]; then export AUTH_URL="https://$RAILWAY_PUBLIC_DOMAIN"; fi
 if [ -z "$AUTH_URL" ] && [ -n "$RENDER_EXTERNAL_URL" ]; then export AUTH_URL="$RENDER_EXTERNAL_URL"; fi
 
-echo "[leto] applying migrations"
-node ./node_modules/prisma/build/index.js migrate deploy
-
-echo "[leto] starting web server on port ${PORT:-3000}"
+MISSING=""
+[ -z "$DATABASE_URL" ] && MISSING="$MISSING DATABASE_URL"
+[ -z "$AUTH_SECRET" ] && MISSING="$MISSING AUTH_SECRET"
+[ -z "$APP_PASSWORD" ] && [ -z "$SEED_DEFAULT_PASSWORD" ] && MISSING="$MISSING APP_PASSWORD"
+if [ -n "$MISSING" ]; then
+  log "ERROR: missing environment variables:$MISSING (Railway: Variables tab; DATABASE_URL = \${{Postgres.DATABASE_URL}})"
+fi
+# Fail fast instead of hanging when the database host is unreachable (e.g. another project's private network).
+case "$DATABASE_URL" in
+  *connect_timeout=*) ;;
+  *\?*) export DATABASE_URL="${DATABASE_URL}&connect_timeout=15" ;;
+  "") ;;
+  *) export DATABASE_URL="${DATABASE_URL}?connect_timeout=15" ;;
+esac
+[ -n "$APP_PASSWORD" ] && log "access mode: shared team password (APP_PASSWORD)"
+log "starting web server on port $PORT (AUTH_URL=${AUTH_URL:-unset})"
 node server.js &
 SERVER_PID=$!
 
-(
-  if [ "${SKIP_SEED:-0}" != "1" ]; then
-    echo "[leto] seeding reference data and users"
-    node ./dist/seed.cjs || echo "[leto] seed failed"
-  fi
-  WB="${PIPELINE_WORKBOOK:-./data/Acompanhamento do Pipe_20260817.xlsx}"
-  if [ "${IMPORT_ON_BOOT:-1}" = "1" ] && [ -f "$WB" ]; then
-    echo "[leto] importing workbook (idempotent): $WB"
-    node ./dist/import-pipeline.cjs "$WB" || echo "[leto] import failed"
-  fi
-  echo "[leto] bootstrap finished"
-) &
+if [ -z "$MISSING" ]; then
+  (
+    log "applying migrations"
+    if node ./node_modules/prisma/build/index.js migrate deploy >> "$LOG" 2>&1; then
+      log "migrations applied"
+      if [ "${SKIP_SEED:-0}" != "1" ]; then
+        log "seeding reference data and users"
+        node ./dist/seed.cjs >> "$LOG" 2>&1 && log "seed done" || log "seed FAILED (see log above)"
+      fi
+      WB="${PIPELINE_WORKBOOK:-./data/Acompanhamento do Pipe_20260817.xlsx}"
+      if [ "${IMPORT_ON_BOOT:-1}" = "1" ] && [ -f "$WB" ]; then
+        log "importing workbook (idempotent): $WB"
+        node ./dist/import-pipeline.cjs "$WB" >> "$LOG" 2>&1 && log "import done" || log "import FAILED (see log above)"
+      fi
+    else
+      log "migrations FAILED — check DATABASE_URL (host reachable? credentials?)"
+    fi
+    log "bootstrap finished"
+  ) &
+else
+  log "bootstrap skipped until the variables above are set"
+fi
 
 wait $SERVER_PID
