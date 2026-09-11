@@ -14,6 +14,7 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npx prisma generate && npx next build \
  && npx esbuild prisma/seed.ts --bundle --platform=node --format=cjs --target=node20 --external:@prisma/client --external:bcryptjs --external:xlsx --external:dotenv --outfile=dist/seed.cjs --log-level=warning \
+ && npx esbuild scripts/migrate-fallback.ts --bundle --platform=node --format=cjs --target=node20 --external:@prisma/client --outfile=dist/migrate-fallback.cjs --log-level=warning \
  && npx esbuild scripts/import-pipeline.ts --bundle --platform=node --format=cjs --target=node20 --external:@prisma/client --external:bcryptjs --external:xlsx --external:dotenv --outfile=dist/import-pipeline.cjs --log-level=warning
 
 FROM node:20-bookworm-slim AS runner

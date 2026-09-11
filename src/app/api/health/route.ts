@@ -13,7 +13,7 @@ export async function GET() {
   }
   let bootstrap: string[] = [];
   try {
-    bootstrap = readFileSync("/app/bootstrap.log", "utf8").split("\n").filter((l) => l.startsWith("[leto]")).slice(-12);
+    bootstrap = readFileSync("/app/bootstrap.log", "utf8").split("\n").filter((l) => l.trim()).map((l) => l.replace(/postgres(ql)?:\/\/[^\s"]+/g, "postgresql://***")).slice(-40);
   } catch {
     /* not running in the container */
   }

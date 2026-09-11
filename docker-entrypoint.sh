@@ -34,7 +34,14 @@ SERVER_PID=$!
 if [ -z "$MISSING" ]; then
   (
     log "applying migrations"
+    MIGRATED=0
     if node ./node_modules/prisma/build/index.js migrate deploy >> "$LOG" 2>&1; then
+      MIGRATED=1
+    else
+      log "prisma CLI failed; applying migrations with the built-in fallback"
+      node ./dist/migrate-fallback.cjs ./prisma/migrations >> "$LOG" 2>&1 && MIGRATED=1
+    fi
+    if [ "$MIGRATED" = "1" ]; then
       log "migrations applied"
       if [ "${SKIP_SEED:-0}" != "1" ]; then
         log "seeding reference data and users"
