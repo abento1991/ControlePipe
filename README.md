@@ -188,14 +188,16 @@ O app precisa de um servidor Node e de um PostgreSQL. Três caminhos prontos no 
 2. Preencha `SEED_DEFAULT_PASSWORD` quando o Render pedir (única variável manual; `AUTH_SECRET` é gerado, `DATABASE_URL` e `AUTH_URL` são ligados automaticamente).
 3. No primeiro boot o container aplica migrations, cria os usuários e importa a planilha `data/*.xlsx` (idempotente). Depois, acesse a URL `https://leto-pipeline.onrender.com` (ou a que o Render atribuir) e faça login.
 
-**2. Docker em qualquer host (Railway, Fly.io, VPS).** `Dockerfile` + `docker-entrypoint.sh` fazem o mesmo bootstrap (migrate → seed → import → start). Variáveis: `DATABASE_URL`, `AUTH_SECRET`, `AUTH_URL`, `AUTH_TRUST_HOST=true`, `SEED_DEFAULT_PASSWORD`; opcionais `IMPORT_ON_BOOT=0` e `SKIP_SEED=1` após a primeira execução.
+**2. Railway.** *New Project → Deploy from GitHub repo* (o Dockerfile é detectado). Depois: (a) *+ New → Database → PostgreSQL* no mesmo projeto; (b) no serviço da app, *Variables*: `DATABASE_URL = ${{Postgres.DATABASE_URL}}`, `AUTH_SECRET` (`openssl rand -base64 32`), `SEED_DEFAULT_PASSWORD`; `AUTH_URL` é preenchida sozinha a partir de `RAILWAY_PUBLIC_DOMAIN`; (c) *Settings → Networking → Generate Domain* para obter a URL pública. O primeiro boot aplica migrations, cria usuários e importa a planilha.
+
+**3. Docker em qualquer host (Fly.io, VPS).** `Dockerfile` + `docker-entrypoint.sh` fazem o mesmo bootstrap (migrate → seed → import → start). Variáveis: `DATABASE_URL`, `AUTH_SECRET`, `AUTH_URL`, `AUTH_TRUST_HOST=true`, `SEED_DEFAULT_PASSWORD`; opcionais `IMPORT_ON_BOOT=0` e `SKIP_SEED=1` após a primeira execução.
 
 ```bash
 docker build -t leto-pipeline .
 docker run -p 3000:3000 --env-file .env leto-pipeline
 ```
 
-**3. Vercel + Supabase/Neon.** `vercel.json` já define o build (`prisma generate && prisma migrate deploy && next build`). Crie o banco (Supabase/Neon), defina as variáveis no projeto Vercel e importe a planilha uma vez localmente apontando `DATABASE_URL` para o banco de produção: `npm run import:pipeline`.
+**4. Vercel + Supabase/Neon.** `vercel.json` já define o build (`prisma generate && prisma migrate deploy && next build`). Crie o banco (Supabase/Neon), defina as variáveis no projeto Vercel e importe a planilha uma vez localmente apontando `DATABASE_URL` para o banco de produção: `npm run import:pipeline`.
 
 Health check em todos os casos: `GET /api/health`.
 

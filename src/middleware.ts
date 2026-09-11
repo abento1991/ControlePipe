@@ -7,7 +7,9 @@ const PUBLIC_PATHS = ["/login", "/api/auth", "/brand", "/_next", "/favicon.ico",
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   if (PUBLIC_PATHS.some((p) => pathname.startsWith(p))) return NextResponse.next();
-  const token = await getToken({ req, secret: process.env.AUTH_SECRET, secureCookie: process.env.AUTH_URL?.startsWith("https://") ?? false });
+  // Behind Railway/Render/Vercel proxies the request arrives as https via x-forwarded-proto; cookie names depend on it.
+  const isHttps = req.nextUrl.protocol === "https:" || req.headers.get("x-forwarded-proto") === "https" || (process.env.AUTH_URL?.startsWith("https://") ?? false);
+  const token = await getToken({ req, secret: process.env.AUTH_SECRET, secureCookie: isHttps });
   if (!token) {
     const url = new URL("/login", req.url);
     if (pathname !== "/") url.searchParams.set("callbackUrl", pathname + req.nextUrl.search);
