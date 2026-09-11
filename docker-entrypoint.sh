@@ -9,6 +9,11 @@ log() { echo "[leto] $*" | tee -a "$LOG"; }
 export PORT=3000
 export HOSTNAME="::"
 export AUTH_TRUST_HOST="${AUTH_TRUST_HOST:-true}"
+# AUTH_URL decides the cookie flavour (http → plain cookies, https → __Secure- cookies). A localhost value copied from
+# .env.example breaks login behind the HTTPS proxy, so it is replaced by the platform's public domain when one is known.
+case "$AUTH_URL" in
+  http://localhost*|http://127.*|http://0.0.0.0*) log "AUTH_URL=$AUTH_URL is a local address — ignoring it in production"; unset AUTH_URL ;;
+esac
 if [ -z "$AUTH_URL" ] && [ -n "$RAILWAY_PUBLIC_DOMAIN" ]; then export AUTH_URL="https://$RAILWAY_PUBLIC_DOMAIN"; fi
 if [ -z "$AUTH_URL" ] && [ -n "$RENDER_EXTERNAL_URL" ]; then export AUTH_URL="$RENDER_EXTERNAL_URL"; fi
 
@@ -46,6 +51,9 @@ if [ -z "$MISSING" ]; then
       if [ "${IMPORT_ON_BOOT:-1}" = "1" ] && [ -f "$WB" ]; then
         log "importing workbook (idempotent): $WB"
         node ./dist/import-pipeline.cjs "$WB" >> "$LOG" 2>&1 && log "import done" || log "import FAILED (see log above)"
+      else
+        log "import skipped (IMPORT_ON_BOOT=${IMPORT_ON_BOOT:-1}, workbook '$WB' exists: $([ -f "$WB" ] && echo yes || echo no))"
+        ls -la ./data >> "$LOG" 2>&1 || log "no ./data directory in the image"
       fi
     else
       log "migrations FAILED — check DATABASE_URL (host reachable? credentials?)"
