@@ -5,6 +5,13 @@ produção naquele momento. Para voltar a uma versão: pedir a reversão (um com
 trabalho, que o Railway publica sozinho) ou usar *Redeploy* em um deploy antigo no painel do Railway.
 Os dados ficam no banco, não no git: antes de mudanças grandes, gerar um "Exportar Excel (backup)".
 
+## v1.1.1 — 2026-09-14 · um só lugar para cadastrar
+Branch: `baseline/v1.1.1`
+
+- Cadastro de oportunidade só pelo botão "Nova oportunidade" no topo. Removidos o botão "Novo caso" e a
+  linha verde de inclusão rápida do Pipe Ativo, e o botão duplicado em Todas as Oportunidades. O botão
+  "Exportar Excel (backup)" continua.
+
 ## v1.1.0 — 2026-09-14 · Minha mesa (dashboard pessoal)
 Branch: `baseline/v1.1.0`
 
