@@ -24,6 +24,27 @@ export function HorizontalBars({ data, valueKey = "count", labelKey = "label", c
   );
 }
 
+/** Horizontal bars split into stacked series (e.g. who declined per reason). Total shown at the end of each bar. */
+export function StackedHorizontalBars({ data, series, labelKey = "label", formatter = (v: number) => formatInt(v) }: { data: Record<string, unknown>[]; series: { key: string; label: string; color: string }[]; labelKey?: string; formatter?: (v: number) => string }) {
+  const rows = data.map((d) => ({ ...d, __total: series.reduce((acc, s) => acc + Number(d[s.key] ?? 0), 0) }));
+  return (
+    <ResponsiveContainer width="100%" height="100%">
+      <BarChart data={rows} layout="vertical" margin={{ left: 8, right: 40, top: 4, bottom: 4 }} barCategoryGap={6}>
+        <CartesianGrid horizontal={false} stroke={GRID} strokeDasharray="2 4" />
+        <XAxis type="number" tick={{ fontSize: 11, fill: AXIS }} axisLine={false} tickLine={false} tickFormatter={(v) => formatter(Number(v))} />
+        <YAxis type="category" dataKey={labelKey} width={150} tick={{ fontSize: 11, fill: "#0f1411" }} axisLine={false} tickLine={false} interval={0} tickFormatter={(v) => truncate(String(v), 26)} />
+        <Tooltip {...tooltipStyle} formatter={(v, name) => [formatter(Number(v)), series.find((s) => s.key === name)?.label ?? String(name)]} />
+        <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11 }} formatter={(v) => series.find((s) => s.key === v)?.label ?? v} />
+        {series.map((s, i) => (
+          <Bar key={s.key} dataKey={s.key} stackId="a" fill={s.color} maxBarSize={22} radius={i === series.length - 1 ? [0, 4, 4, 0] : [0, 0, 0, 0]}>
+            {i === series.length - 1 && <LabelList dataKey="__total" position="right" style={{ fontSize: 11, fill: AXIS }} formatter={(v: number) => formatter(v)} />}
+          </Bar>
+        ))}
+      </BarChart>
+    </ResponsiveContainer>
+  );
+}
+
 export function Columns({ data, valueKey = "count", labelKey = "label", color, colorful, formatter = (v: number) => formatInt(v), showValues = true, angle = 0 }: { data: Record<string, unknown>[]; valueKey?: string; labelKey?: string; color?: string; colorful?: boolean; formatter?: (v: number) => string; showValues?: boolean; angle?: number }) {
   return (
     <ResponsiveContainer width="100%" height="100%">
