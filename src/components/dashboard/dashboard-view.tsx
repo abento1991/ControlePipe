@@ -4,7 +4,7 @@ import Link from "next/link";
 import { AlertCircle, CalendarClock, ChevronRight, UserCircle2 } from "lucide-react";
 import { KpiCard } from "@/components/common/kpi-card";
 import { ChartCard } from "@/components/charts/chart-card";
-import { Columns, Donut, Funnel, HorizontalBars, MonthlySeries, StackedHorizontalBars } from "@/components/charts/charts";
+import { Columns, Donut, Funnel, HorizontalBars, MonthlySeries, StackedHorizontalBars, Waterfall } from "@/components/charts/charts";
 import { StatusBadge } from "@/components/common/badges";
 import { AssigneeAvatars } from "@/components/common/user-avatar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -102,8 +102,9 @@ export function DashboardView({ data, personal, periodLabel, userName }: { data:
       </section>
 
       {/* 5b. Why we say no */}
-      <section className="grid gap-4">
+      <section className="grid gap-4 xl:grid-cols-5">
         <ChartCard
+          className="xl:col-span-2"
           title="Motivos de recusa"
           description={`${formatInt(data.declinedTotal)} declinadas · ${formatInt(data.declinedWithoutReason)} sem motivo classificado${data.declineReasons.some((r) => r.inferred) ? " · parte classificada automaticamente a partir do texto da planilha" : ""}`}
           period={periodLabel}
@@ -126,6 +127,27 @@ export function DashboardView({ data, personal, periodLabel, userName }: { data:
             series={[
               { key: "leto", label: "Leto declinou", color: "#9a4b4b" },
               { key: "contraparte", label: "Contraparte recusou / desistiu", color: "#c99a3b" },
+            ]}
+          />
+        </ChartCard>
+        <ChartCard
+          className="xl:col-span-3"
+          title="Do recebido ao que seguiu"
+          description="Waterfall: cada motivo de recusa retira uma fatia das oportunidades recebidas; o que sobra está ativo, on hold ou concluído"
+          period={periodLabel}
+          height={Math.max(240, 36 * data.declineReasons.length + 60)}
+          highlights={[
+            { label: "Recebidas", value: formatInt(k.total) },
+            { label: "Declinadas", value: `${formatInt(data.declinedTotal)} (${Math.round((data.declinedTotal / Math.max(1, k.total)) * 100)}%)` },
+            { label: "Seguiram", value: formatInt(k.total - data.declinedTotal) },
+          ]}
+        >
+          <Waterfall
+            data={[
+              { label: "Recebidas", value: k.total, type: "total" },
+              ...data.declineReasons.map((r) => ({ label: r.short, value: -r.count, type: "delta" as const })),
+              ...(data.declinedWithoutReason ? [{ label: "Sem motivo", value: -data.declinedWithoutReason, type: "delta" as const }] : []),
+              { label: "Seguiram", value: k.total - data.declinedTotal, type: "total" },
             ]}
           />
         </ChartCard>

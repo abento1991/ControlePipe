@@ -45,6 +45,38 @@ export function StackedHorizontalBars({ data, series, labelKey = "label", format
   );
 }
 
+/**
+ * Waterfall: "total" steps are full bars from zero; "delta" steps float from the running level.
+ * Negative deltas (leaks) are drawn in red, positive in green, totals in ink/lime.
+ */
+export function Waterfall({ data, formatter = (v: number) => formatInt(v) }: { data: { label: string; value: number; type: "total" | "delta" }[]; formatter?: (v: number) => string }) {
+  let level = 0;
+  const rows = data.map((d) => {
+    if (d.type === "total") {
+      level = d.value;
+      return { ...d, base: 0, size: d.value, fill: "#050505", shown: d.value };
+    }
+    const start = level;
+    level = level + d.value;
+    return { ...d, base: Math.min(start, level), size: Math.abs(d.value), fill: d.value < 0 ? "#9a4b4b" : LETO_GREEN_DEEP, shown: d.value };
+  });
+  return (
+    <ResponsiveContainer width="100%" height="100%">
+      <BarChart data={rows} margin={{ left: 0, right: 8, top: 18, bottom: 28 }} barCategoryGap={10}>
+        <CartesianGrid vertical={false} stroke={GRID} strokeDasharray="2 4" />
+        <XAxis dataKey="label" tick={{ fontSize: 10, fill: AXIS }} axisLine={false} tickLine={false} interval={0} angle={-22} textAnchor="end" height={44} tickFormatter={(v) => truncate(String(v), 16)} />
+        <YAxis tick={{ fontSize: 11, fill: AXIS }} axisLine={false} tickLine={false} tickFormatter={(v) => formatter(Number(v))} />
+        <Tooltip {...tooltipStyle} cursor={{ fill: "rgba(0,0,0,0.04)" }} formatter={(v, name, item) => (name === "size" ? [formatter(Number((item as { payload?: { shown?: number } }).payload?.shown ?? v)), (item as { payload?: { type?: string } }).payload?.type === "total" ? "Total" : "Variação"] : [null, null])} />
+        <Bar dataKey="base" stackId="w" fill="#ffffff" fillOpacity={0} stroke="none" isAnimationActive={false} />
+        <Bar dataKey="size" stackId="w" maxBarSize={36} radius={[3, 3, 0, 0]}>
+          {rows.map((r, i) => <Cell key={i} fill={r.fill} />)}
+          <LabelList dataKey="shown" position="top" style={{ fontSize: 10, fill: AXIS }} formatter={(v: number) => (v > 0 && rows.find((r) => r.shown === v)?.type === "delta" ? `+${formatter(v)}` : formatter(v))} />
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
+  );
+}
+
 export function Columns({ data, valueKey = "count", labelKey = "label", color, colorful, formatter = (v: number) => formatInt(v), showValues = true, angle = 0 }: { data: Record<string, unknown>[]; valueKey?: string; labelKey?: string; color?: string; colorful?: boolean; formatter?: (v: number) => string; showValues?: boolean; angle?: number }) {
   return (
     <ResponsiveContainer width="100%" height="100%">

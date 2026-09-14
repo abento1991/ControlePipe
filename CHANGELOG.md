@@ -5,11 +5,13 @@ produção naquele momento. Para voltar a uma versão: pedir a reversão (um com
 trabalho, que o Railway publica sozinho) ou usar *Redeploy* em um deploy antigo no painel do Railway.
 Os dados ficam no banco, não no git: antes de mudanças grandes, gerar um "Exportar Excel (backup)".
 
-## v1.2.1 — 2026-09-14 · gráfico de recusas em barras empilhadas
+## v1.2.1 — 2026-09-14 · recusas em barras empilhadas + waterfall
 Branch: `baseline/v1.2.1`
 
 - O donut "Quem recusou" saiu. O gráfico "Motivos de recusa" passou a mostrar, em cada barra, a parte
   "Leto declinou" e a parte "contraparte recusou / desistiu".
+- Novo waterfall "Do recebido ao que seguiu": das oportunidades recebidas, cada motivo de recusa retira
+  uma fatia até chegar ao que seguiu (ativas, on hold e concluídas).
 
 ## v1.2.0 — 2026-09-14 · motivos de recusa estruturados
 Branch: `baseline/v1.2.0`
