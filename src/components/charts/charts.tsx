@@ -49,16 +49,16 @@ export function StackedHorizontalBars({ data, series, labelKey = "label", format
  * Waterfall: "total" steps are full bars from zero; "delta" steps float from the running level.
  * Negative deltas (leaks) are drawn in red, positive in green, totals in ink/lime.
  */
-export function Waterfall({ data, formatter = (v: number) => formatInt(v) }: { data: { label: string; value: number; type: "total" | "delta" }[]; formatter?: (v: number) => string }) {
+export function Waterfall({ data, formatter = (v: number) => formatInt(v) }: { data: { label: string; value: number; type: "total" | "delta"; color?: string }[]; formatter?: (v: number) => string }) {
   let level = 0;
   const rows = data.map((d) => {
     if (d.type === "total") {
       level = d.value;
-      return { ...d, base: 0, size: d.value, fill: "#050505", shown: d.value };
+      return { ...d, base: 0, size: d.value, fill: d.color ?? "#050505", shown: d.value };
     }
     const start = level;
     level = level + d.value;
-    return { ...d, base: Math.min(start, level), size: Math.abs(d.value), fill: d.value < 0 ? "#9a4b4b" : LETO_GREEN_DEEP, shown: d.value };
+    return { ...d, base: Math.min(start, level), size: Math.abs(d.value), fill: d.color ?? (d.value < 0 ? "#9a4b4b" : LETO_GREEN_DEEP), shown: d.value };
   });
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -70,7 +70,7 @@ export function Waterfall({ data, formatter = (v: number) => formatInt(v) }: { d
         <Bar dataKey="base" stackId="w" fill="#ffffff" fillOpacity={0} stroke="none" isAnimationActive={false} />
         <Bar dataKey="size" stackId="w" maxBarSize={36} radius={[3, 3, 0, 0]}>
           {rows.map((r, i) => <Cell key={i} fill={r.fill} />)}
-          <LabelList dataKey="shown" position="top" style={{ fontSize: 10, fill: AXIS }} formatter={(v: number) => (v > 0 && rows.find((r) => r.shown === v)?.type === "delta" ? `+${formatter(v)}` : formatter(v))} />
+          <LabelList dataKey="shown" position="top" style={{ fontSize: 10, fill: AXIS }} formatter={(v: number) => formatter(v)} />
         </Bar>
       </BarChart>
     </ResponsiveContainer>

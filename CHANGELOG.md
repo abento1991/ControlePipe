@@ -10,8 +10,8 @@ Branch: `baseline/v1.2.1`
 
 - O donut "Quem recusou" saiu. O gráfico "Motivos de recusa" passou a mostrar, em cada barra, a parte
   "Leto declinou" e a parte "contraparte recusou / desistiu".
-- Novo waterfall "Do recebido ao que seguiu": das oportunidades recebidas, cada motivo de recusa retira
-  uma fatia até chegar ao que seguiu (ativas, on hold e concluídas).
+- Novo waterfall "Como se somam as recusas": começa do zero e empilha motivo a motivo (mais as sem
+  motivo) até o total de oportunidades declinadas.
 
 ## v1.2.0 — 2026-09-14 · motivos de recusa estruturados
 Branch: `baseline/v1.2.0`

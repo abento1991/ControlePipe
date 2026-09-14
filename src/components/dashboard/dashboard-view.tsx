@@ -132,22 +132,21 @@ export function DashboardView({ data, personal, periodLabel, userName }: { data:
         </ChartCard>
         <ChartCard
           className="xl:col-span-3"
-          title="Do recebido ao que seguiu"
-          description="Waterfall: cada motivo de recusa retira uma fatia das oportunidades recebidas; o que sobra está ativo, on hold ou concluído"
+          title="Como se somam as recusas"
+          description="Waterfall: cada motivo empilha sobre o anterior até o total de oportunidades declinadas"
           period={periodLabel}
           height={Math.max(240, 36 * data.declineReasons.length + 60)}
           highlights={[
-            { label: "Recebidas", value: formatInt(k.total) },
-            { label: "Declinadas", value: `${formatInt(data.declinedTotal)} (${Math.round((data.declinedTotal / Math.max(1, k.total)) * 100)}%)` },
-            { label: "Seguiram", value: formatInt(k.total - data.declinedTotal) },
+            { label: "Declinadas", value: formatInt(data.declinedTotal) },
+            { label: "% das recebidas", value: `${Math.round((data.declinedTotal / Math.max(1, k.total)) * 100)}%` },
+            { label: "Sem motivo", value: formatInt(data.declinedWithoutReason) },
           ]}
         >
           <Waterfall
             data={[
-              { label: "Recebidas", value: k.total, type: "total" },
-              ...data.declineReasons.map((r) => ({ label: r.short, value: -r.count, type: "delta" as const })),
-              ...(data.declinedWithoutReason ? [{ label: "Sem motivo", value: -data.declinedWithoutReason, type: "delta" as const }] : []),
-              { label: "Seguiram", value: k.total - data.declinedTotal, type: "total" },
+              ...data.declineReasons.map((r) => ({ label: r.short, value: r.count, type: "delta" as const, color: "#9a4b4b" })),
+              ...(data.declinedWithoutReason ? [{ label: "Sem motivo", value: data.declinedWithoutReason, type: "delta" as const, color: "#b9b3b3" }] : []),
+              { label: "Declinadas", value: data.declinedTotal, type: "total" as const },
             ]}
           />
         </ChartCard>
