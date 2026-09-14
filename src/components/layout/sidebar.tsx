@@ -3,12 +3,13 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Kanban, PauseCircle, Layers, Users, Building2, BarChart3, Settings, ChevronLeft, ChevronRight, X, ShieldCheck, ListChecks, FileSpreadsheet, History, Tags } from "lucide-react";
+import { LayoutDashboard, Kanban, UserCircle2, PauseCircle, Layers, Users, Building2, BarChart3, Settings, ChevronLeft, ChevronRight, X, ShieldCheck, ListChecks, FileSpreadsheet, History, Tags } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const NAV = [
   { href: "/pipeline", label: "Pipe Ativo", icon: Kanban },
+  { href: "/minha-mesa", label: "Minha mesa", icon: UserCircle2 },
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/on-hold", label: "On Hold / Inativo", icon: PauseCircle },
   { href: "/opportunities", label: "Todas as Oportunidades", icon: Layers },
