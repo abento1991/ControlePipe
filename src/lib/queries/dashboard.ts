@@ -1,5 +1,6 @@
 import { prisma } from "../db";
 import { buildWhere, type OpportunityFilters } from "./filters";
+import { DECLINE_REASONS, DECLINED_BY_LABELS } from "../normalization/decline-reasons";
 import { AGING_BUCKETS, agingBucket, monthKey } from "../utils";
 import { COMPANY_CATEGORY_LABELS } from "../normalization/originators";
 import { detectMilestones } from "../normalization/legacy-timeline";
@@ -44,6 +45,11 @@ export interface DashboardData {
   byYear: NamedCount[];
   aging: NamedCount[];
   funnel: { stage: string; count: number; note?: string }[];
+  /** Declined opportunities by structured reason (LETO / CONTRAPARTE split, inferred share). */
+  declineReasons: { key: string; label: string; short: string; count: number; leto: number; contraparte: number; inferred: number }[];
+  declinedBy: NamedCount[];
+  declinedTotal: number;
+  declinedWithoutReason: number;
   filters: OpportunityFilters;
   generatedAt: string;
 }
@@ -101,6 +107,9 @@ export async function getDashboardData(filters: OpportunityFilters, now: Date = 
       lastActivityAt: true,
       updatedAt: true,
       legacyStatusText: true,
+      declineReason: true,
+      declinedBy: true,
+      declineReasonInferred: true,
       operationType: { select: { id: true, name: true, category: true, color: true } },
       status: { select: { key: true, name: true, group: true, outcome: true, color: true, sortOrder: true } },
       assignees: { select: { user: { select: { id: true, name: true, color: true } } } },
@@ -124,6 +133,10 @@ export async function getDashboardData(filters: OpportunityFilters, now: Date = 
   const byYear = new Map<string, NamedCount>();
   const aging = new Map<string, NamedCount>();
   for (const b of AGING_BUCKETS) aging.set(b, { key: b, label: `${b} dias`, count: 0, volume: 0 });
+  const declineReasons = new Map(DECLINE_REASONS.map((r) => [r.key, { key: r.key, label: r.label, short: r.short, count: 0, leto: 0, contraparte: 0, inferred: 0 }]));
+  const declinedBy = new Map<string, NamedCount>();
+  let declinedTotal = 0;
+  let declinedWithoutReason = 0;
   let daysSum = 0;
   let daysN = 0;
   let proposals = 0;
@@ -178,6 +191,17 @@ export async function getDashboardData(filters: OpportunityFilters, now: Date = 
     bump(byChannel, o.entryChannel ?? "none", o.entryChannel ? CHANNEL_LABELS[o.entryChannel] : "Não informado", amount, isConcluded, isActive);
     bump(byStatus, o.status.key, o.status.name, amount, isConcluded, isActive, o.status.color);
     bump(byYear, String(o.entryYear ?? "—"), String(o.entryYear ?? "Sem ano"), amount, isConcluded, isActive);
+    if (o.status.outcome === "LOST") {
+      declinedTotal++;
+      const r = o.declineReason ? declineReasons.get(o.declineReason) : null;
+      if (r) {
+        r.count++;
+        if (o.declinedBy === "CONTRAPARTE") r.contraparte++;
+        else r.leto++;
+        if (o.declineReasonInferred) r.inferred++;
+      } else declinedWithoutReason++;
+      bump(declinedBy, o.declinedBy ?? "none", o.declinedBy ? DECLINED_BY_LABELS[o.declinedBy] : "Não informado", amount, isConcluded, isActive);
+    }
     // Funnel from available evidence: proposals (explicit activity or legacy text), deep analysis (legacy keywords)
     const texts = o.activities.map((a) => (a.type === "PROPOSAL_SENT" ? "proposta enviada" : a.body ?? ""));
     const joined = texts.join("\n").toLowerCase();
@@ -206,6 +230,10 @@ export async function getDashboardData(filters: OpportunityFilters, now: Date = 
     byStatus: [...byStatus.values()].sort((a, b) => (statusOrder.get(a.key) ?? 0) - (statusOrder.get(b.key) ?? 0)),
     byYear: [...byYear.values()].sort((a, b) => a.key.localeCompare(b.key)),
     aging: [...aging.values()],
+    declineReasons: [...declineReasons.values()].filter((r) => r.count > 0).sort((a, b) => b.count - a.count),
+    declinedBy: sorted(declinedBy),
+    declinedTotal,
+    declinedWithoutReason,
     funnel: [
       { stage: "Recebido", count: rows.length },
       { stage: "Pré-analisado", count: preAnalysed, note: "Com registro de análise/decisão" },

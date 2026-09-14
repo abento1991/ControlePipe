@@ -101,6 +101,23 @@ export function DashboardView({ data, personal, periodLabel, userName }: { data:
         </ChartCard>
       </section>
 
+      {/* 5b. Why we say no */}
+      <section className="grid gap-4 xl:grid-cols-3">
+        <ChartCard
+          title="Motivos de recusa"
+          description={`${formatInt(data.declinedTotal)} declinadas · ${formatInt(data.declinedWithoutReason)} sem motivo classificado${data.declineReasons.some((r) => r.inferred) ? " · parte classificada automaticamente a partir do texto da planilha" : ""}`}
+          period={periodLabel}
+          height={Math.max(220, 36 * data.declineReasons.length + 40)}
+          className="xl:col-span-2"
+          highlights={data.declineReasons.slice(0, 2).map((r) => ({ label: r.label, value: `${Math.round((r.count / Math.max(1, data.declinedTotal - data.declinedWithoutReason)) * 100)}%` }))}
+        >
+          <HorizontalBars data={data.declineReasons as unknown as Record<string, unknown>[]} labelKey="short" color="#9a4b4b" />
+        </ChartCard>
+        <ChartCard title="Quem recusou" description="Leto declinou vs. contraparte recusou ou desistiu" period={periodLabel} height={Math.max(220, 36 * data.declineReasons.length + 40)}>
+          <Donut data={data.declinedBy as unknown as Record<string, unknown>[]} centerLabel="declinadas" centerValue={formatInt(data.declinedTotal)} />
+        </ChartCard>
+      </section>
+
       {/* 6. Personal */}
       <section className="grid grid-cols-1 xl:grid-cols-3 gap-3">
         <Card className="xl:col-span-1">

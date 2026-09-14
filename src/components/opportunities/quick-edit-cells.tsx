@@ -14,6 +14,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { DeclineDialog } from "./decline-fields";
 
 const GROUP_LABELS: Record<string, string> = { ACTIVE: "Ativo", ON_HOLD: "On Hold", CONCLUDED: "Concluído", CLOSED: "Encerrado" };
 
@@ -22,7 +23,27 @@ export function StatusCell({ id, status }: { id: string; status: { key: string; 
   const router = useRouter();
   const [pending, start] = useTransition();
   const groups = ["ACTIVE", "ON_HOLD", "CONCLUDED", "CLOSED"].map((g) => ({ g, items: ref.statuses.filter((s) => s.group === g) }));
+  const [declining, setDeclining] = useState(false);
   return (
+    <>
+    {declining && (
+      <DeclineDialog
+        open={declining}
+        onOpenChange={setDeclining}
+        pending={pending}
+        onConfirm={(v) =>
+          start(async () => {
+            const res = await quickUpdateOpportunity(id, { statusKey: "DECLINED", declineReason: v.declineReason, declinedBy: v.declinedBy, closeReason: v.closeReason.trim() || null });
+            if (!res.ok) toast.error(res.error);
+            else {
+              toast.success("Declinada com motivo registrado.");
+              setDeclining(false);
+              router.refresh();
+            }
+          })
+        }
+      />
+    )}
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className={cn("rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-ring", pending && "opacity-50")} onClick={(e) => e.stopPropagation()}>
@@ -38,7 +59,11 @@ export function StatusCell({ id, status }: { id: string; status: { key: string; 
               <DropdownMenuItem
                 key={s.key}
                 disabled={s.key === status.key}
-                onSelect={() =>
+                onSelect={() => {
+                  if (s.key === "DECLINED") {
+                    setDeclining(true);
+                    return;
+                  }
                   start(async () => {
                     const res = await quickUpdateOpportunity(id, { statusKey: s.key });
                     if (!res.ok) toast.error(res.error);
@@ -46,8 +71,8 @@ export function StatusCell({ id, status }: { id: string; status: { key: string; 
                       toast.success(`Status: ${s.name}`);
                       router.refresh();
                     }
-                  })
-                }
+                  });
+                }}
               >
                 <span className="h-2 w-2 rounded-full" style={{ backgroundColor: s.color ?? "#999" }} />
                 {s.name}
@@ -57,6 +82,7 @@ export function StatusCell({ id, status }: { id: string; status: { key: string; 
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
+    </>
   );
 }
 

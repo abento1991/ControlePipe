@@ -23,6 +23,8 @@ import { AuditPanel, RawDataPanel } from "./audit-panel";
 import { OriginatorPanel } from "./originator-panel";
 import { useReference } from "@/components/layout/reference-context";
 import { closeOpportunity, reactivateOpportunity, deleteOpportunity } from "@/lib/actions/opportunities";
+import { DeclineFields, EMPTY_DECLINE, type DeclineValue } from "../decline-fields";
+import { DECLINE_REASON_LABELS, DECLINED_BY_LABELS, type DeclineReasonKey, type DeclinedByKey } from "@/lib/normalization/decline-reasons";
 import { CHANNEL_LABELS } from "@/lib/queries/dashboard";
 import { COMPANY_CATEGORY_LABELS } from "@/lib/normalization/originators";
 import { ISSUE_LABELS } from "@/lib/constants";
@@ -250,6 +252,13 @@ export function OpportunityDetailView({ data: o, isAdmin }: { data: OpportunityD
                   </div>
                   {o.assigneesRaw && <div className="text-2xs text-muted-foreground mt-1">planilha: “{o.assigneesRaw}”</div>}
                 </Field>
+                {o.declineReason && (
+                  <Field label="Motivo da recusa">
+                    {DECLINE_REASON_LABELS[o.declineReason as DeclineReasonKey]}
+                    {o.declinedBy && <span className="text-muted-foreground"> · {DECLINED_BY_LABELS[o.declinedBy as DeclinedByKey]}</span>}
+                    {o.declineReasonInferred && <span className="block text-2xs text-muted-foreground">classificado automaticamente a partir do texto da planilha</span>}
+                  </Field>
+                )}
                 {o.closeReason && <Field label="Motivo do encerramento">{o.closeReason}</Field>}
               </div>
             </div>
@@ -340,7 +349,7 @@ export function OpportunityDetailView({ data: o, isAdmin }: { data: OpportunityD
         onSaved={() => router.refresh()}
       />
 
-      <CloseDialog target={closeDialog} onOpenChange={(v) => !v && setCloseDialog(null)} onConfirm={(reason) => run(() => closeOpportunity(o.id, closeDialog!, reason), "Status atualizado.")} pending={pending} />
+      <CloseDialog target={closeDialog} onOpenChange={(v) => !v && setCloseDialog(null)} onConfirm={(reason, decline) => run(() => closeOpportunity(o.id, closeDialog!, reason, decline ? { declineReason: decline.declineReason, declinedBy: decline.declinedBy } : undefined), "Status atualizado.")} pending={pending} />
       <ReactivateDialog open={reactivate} onOpenChange={setReactivate} statuses={ref.statuses.filter((s) => s.group === "ACTIVE")} onConfirm={(key, note) => run(() => reactivateOpportunity(o.id, key, note), "Oportunidade reativada.")} pending={pending} previous={o.status.name} />
     </div>
   );
@@ -353,9 +362,12 @@ const CLOSE_LABELS: Record<string, { title: string; desc: string }> = {
   INACTIVE: { title: "Marcar como inativa", desc: "Encerra por inatividade (sem retorno, perdeu relevância)." },
 };
 
-function CloseDialog({ target, onOpenChange, onConfirm, pending }: { target: string | null; onOpenChange: (v: boolean) => void; onConfirm: (reason: string) => void; pending: boolean }) {
+function CloseDialog({ target, onOpenChange, onConfirm, pending }: { target: string | null; onOpenChange: (v: boolean) => void; onConfirm: (reason: string, decline?: DeclineValue) => void; pending: boolean }) {
   const [reason, setReason] = useState("");
+  const [decline, setDecline] = useState<DeclineValue>(EMPTY_DECLINE);
   const meta = target ? CLOSE_LABELS[target] : null;
+  const declining = target === "DECLINED";
+  const canConfirm = !declining || (!!decline.declineReason && !!decline.declinedBy && (decline.declineReason !== "OUTRO" || decline.closeReason.trim().length > 0));
   return (
     <Dialog open={!!target} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
@@ -363,21 +375,26 @@ function CloseDialog({ target, onOpenChange, onConfirm, pending }: { target: str
           <DialogTitle>{meta?.title}</DialogTitle>
           <DialogDescription>{meta?.desc}</DialogDescription>
         </DialogHeader>
-        <div className="space-y-1.5">
-          <Label>{target === "CONCLUDED" ? "Observações" : "Motivo"}</Label>
-          <Textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3} placeholder={target === "DECLINED" ? "Ex.: garantia insuficiente, TIR abaixo do mínimo…" : ""} />
-        </div>
+        {declining ? (
+          <DeclineFields value={decline} onChange={setDecline} />
+        ) : (
+          <div className="space-y-1.5">
+            <Label>{target === "CONCLUDED" ? "Observações" : "Motivo"}</Label>
+            <Textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3} />
+          </div>
+        )}
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancelar
           </Button>
           <Button
             variant={target === "DECLINED" || target === "INACTIVE" ? "destructive" : "default"}
-            disabled={pending}
+            disabled={pending || !canConfirm}
             onClick={() => {
-              onConfirm(reason);
+              onConfirm(declining ? decline.closeReason.trim() : reason, declining ? decline : undefined);
               onOpenChange(false);
               setReason("");
+              setDecline(EMPTY_DECLINE);
             }}
           >
             Confirmar

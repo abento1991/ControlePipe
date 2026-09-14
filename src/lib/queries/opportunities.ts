@@ -26,6 +26,9 @@ export const opportunityListSelect = {
   legacyStatusText: true,
   legacyFeedback: true,
   closeReason: true,
+  declineReason: true,
+  declinedBy: true,
+  declineReasonInferred: true,
   activities: { where: { type: { in: ["NOTE", "EMAIL", "WHATSAPP", "MEETING", "CALL", "INFO_RECEIVED", "PROPOSAL_SENT", "LEGACY_STATUS", "STATUS_CHANGED", "REACTIVATED", "CLOSED", "FOLLOW_UP", "MEETING_SNAPSHOT"] } }, orderBy: [{ occurredAt: "desc" as const }, { createdAt: "desc" as const }], take: 1, select: { type: true, title: true, body: true, occurredAt: true, isLegacy: true } },
   _count: { select: { activities: true } },
   operationType: { select: { id: true, name: true, color: true, category: true } },
@@ -62,6 +65,9 @@ export interface OpportunityRowDTO {
   legacyStatusText: string | null;
   legacyFeedback: string | null;
   closeReason: string | null;
+  declineReason: string | null;
+  declinedBy: string | null;
+  declineReasonInferred: boolean;
   /** Latest history entry (activity) for the "Atualizações" column. */
   lastUpdate: { date: string; text: string; type: string; isLegacy: boolean } | null;
   updatesCount: number;
@@ -103,6 +109,9 @@ export function toRowDTO(o: OpportunityListRow, now: Date = new Date()): Opportu
     legacyStatusText: o.legacyStatusText,
     legacyFeedback: o.legacyFeedback,
     closeReason: o.closeReason,
+    declineReason: o.declineReason,
+    declinedBy: o.declinedBy,
+    declineReasonInferred: o.declineReasonInferred,
     lastUpdate: o.activities[0] ? { date: o.activities[0].occurredAt.toISOString(), text: (o.activities[0].body ?? o.activities[0].title ?? "").trim(), type: o.activities[0].type, isLegacy: o.activities[0].isLegacy } : null,
     updatesCount: o._count.activities,
     operationType: o.operationType,

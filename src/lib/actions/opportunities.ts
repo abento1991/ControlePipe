@@ -1,5 +1,7 @@
 "use server";
 
+import type { DeclineReason, DeclinedBy } from "@prisma/client";
+
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import type { Prisma } from "@prisma/client";
@@ -237,6 +239,8 @@ const quickSchema = z.object({
   companyId: z.string().nullable().optional(),
   contactId: z.string().nullable().optional(),
   closeReason: z.string().nullable().optional(),
+  declineReason: z.enum(["SEM_FIT", "GARANTIA_RISCO", "PRECO_RETORNO", "CREDITO_FRACO", "PRAZO", "TICKET", "ATIVO_RESOLVIDO", "PERDEMOS_CONCORRENTE", "CONTRAPARTE_DESISTIU", "NAO_PARTICIPAMOS", "OUTRO"]).nullable().optional(),
+  declinedBy: z.enum(["LETO", "CONTRAPARTE"]).nullable().optional(),
 });
 
 /** Inline edits from tables (status, assignees, next action, follow-up date). */
@@ -261,6 +265,16 @@ export async function quickUpdateOpportunity(id: string, input: z.input<typeof q
         const wasClosed = before.status.group === "CLOSED" || before.status.group === "ON_HOLD" || before.status.group === "CONCLUDED";
         const reopen = wasClosed && status.group === "ACTIVE";
         await tx.activity.create({ data: { opportunityId: id, type: reopen ? "REACTIVATED" : status.group === "CONCLUDED" || status.group === "CLOSED" ? "CLOSED" : "STATUS_CHANGED", title: `${reopen ? "Reativada — " : ""}Status: ${before.status.name} → ${status.name}`, occurredAt: now, userId: user.id, metadata: { from: before.status.key, to: status.key } } });
+      }
+      if (d.declineReason !== undefined) {
+        data.declineReason = d.declineReason;
+        data.declineReasonInferred = false;
+        changes.push({ field: "declineReason", oldValue: before.declineReason, newValue: d.declineReason });
+      }
+      if (d.declinedBy !== undefined) {
+        data.declinedBy = d.declinedBy;
+        data.declineReasonInferred = false;
+        changes.push({ field: "declinedBy", oldValue: before.declinedBy, newValue: d.declinedBy });
       }
       if (d.nextAction !== undefined) {
         data.nextAction = d.nextAction || null;
@@ -369,7 +383,7 @@ export async function reactivateOpportunity(id: string, targetStatusKey = "ANALY
   }
 }
 
-export async function closeOpportunity(id: string, statusKey: "DECLINED" | "INACTIVE" | "CONCLUDED" | "ON_HOLD", reason?: string): Promise<ActionResult<{ id: string }>> {
+export async function closeOpportunity(id: string, statusKey: "DECLINED" | "INACTIVE" | "CONCLUDED" | "ON_HOLD", reason?: string, decline?: { declineReason?: DeclineReason | null; declinedBy?: DeclinedBy | null }): Promise<ActionResult<{ id: string }>> {
   try {
     const user = await actionUser();
     const before = await prisma.opportunity.findUnique({ where: { id }, include: { status: true } });
@@ -379,9 +393,10 @@ export async function closeOpportunity(id: string, statusKey: "DECLINED" | "INAC
     const now = new Date();
     await prisma.$transaction(async (tx) => {
       const closing = target.group === "CLOSED" || target.group === "CONCLUDED";
-      await tx.opportunity.update({ where: { id }, data: { statusId: target.id, closedAt: closing ? now : null, closeReason: reason || null, exitDate: closing ? before.exitDate ?? now : before.exitDate, lastActivityAt: now } });
+      const declineData = statusKey === "DECLINED" && decline ? { declineReason: decline.declineReason ?? null, declinedBy: decline.declinedBy ?? null, declineReasonInferred: false } : {};
+      await tx.opportunity.update({ where: { id }, data: { statusId: target.id, closedAt: closing ? now : null, closeReason: reason || null, exitDate: closing ? before.exitDate ?? now : before.exitDate, lastActivityAt: now, ...declineData } });
       await tx.activity.create({ data: { opportunityId: id, type: closing ? "CLOSED" : "STATUS_CHANGED", title: `${target.name}: ${before.status.name} → ${target.name}`, body: reason || null, occurredAt: now, userId: user.id, metadata: { from: before.status.key, to: target.key } } });
-      await logAudit(tx, { entity: "Opportunity", entityId: id, opportunityId: id, action: closing ? "close" : "update", userId: user.id, changes: [{ field: "status", oldValue: before.status.key, newValue: target.key }, { field: "closeReason", oldValue: before.closeReason, newValue: reason || null }] });
+      await logAudit(tx, { entity: "Opportunity", entityId: id, opportunityId: id, action: closing ? "close" : "update", userId: user.id, changes: [{ field: "status", oldValue: before.status.key, newValue: target.key }, { field: "closeReason", oldValue: before.closeReason, newValue: reason || null }, ...(statusKey === "DECLINED" && decline ? [{ field: "declineReason", oldValue: before.declineReason, newValue: decline.declineReason ?? null }, { field: "declinedBy", oldValue: before.declinedBy, newValue: decline.declinedBy ?? null }] : [])] });
     });
     revalidateAll(id);
     return ok({ id });

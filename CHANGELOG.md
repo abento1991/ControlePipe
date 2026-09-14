@@ -5,6 +5,20 @@ produção naquele momento. Para voltar a uma versão: pedir a reversão (um com
 trabalho, que o Railway publica sozinho) ou usar *Redeploy* em um deploy antigo no painel do Railway.
 Os dados ficam no banco, não no git: antes de mudanças grandes, gerar um "Exportar Excel (backup)".
 
+## v1.2.0 — 2026-09-14 · motivos de recusa estruturados
+Branch: `baseline/v1.2.0`
+
+- Ao marcar uma oportunidade como **Declinada** (tabela, Minha mesa ou página do caso) abre uma janela
+  para escolher o **motivo** em lista fechada (sem fit, garantia/risco, preço/retorno, crédito fraco,
+  prazo, ticket, já resolvido, concorrente, contraparte desistiu, sem proposta, outro) e **quem recusou**
+  (Leto ou contraparte), com detalhes em texto.
+- A coluna "Motivo / feedback" mostra a categoria e permite corrigir motivo e quem recusou.
+- **Dashboard:** novos gráficos "Motivos de recusa" e "Quem recusou".
+- As 736 recusas históricas foram classificadas automaticamente a partir do texto da planilha
+  (98% das que tinham texto) e aparecem marcadas com * até alguém confirmar/corrigir.
+- Backup Excel ganha as colunas "Motivo (categoria)", "Quem recusou" e "Motivo inferido do texto".
+- Estrutura do banco: migration `20260914194221_decline_reason` (aplicada sozinha no deploy).
+
 ## v1.1.1 — 2026-09-14 · um só lugar para cadastrar
 Branch: `baseline/v1.1.1`
 

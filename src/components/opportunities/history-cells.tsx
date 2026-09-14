@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { addUpdate } from "@/lib/actions/activities";
 import { quickUpdateOpportunity } from "@/lib/actions/opportunities";
+import { DeclineFields, type DeclineValue } from "./decline-fields";
+import { DECLINE_REASON_SHORT, DECLINED_BY_LABELS, type DeclineReasonKey, type DeclinedByKey } from "@/lib/normalization/decline-reasons";
 
 interface Entry {
   id: string;
@@ -114,26 +116,35 @@ export function HistoryCell({ id, lastUpdate, count }: { id: string; lastUpdate:
 }
 
 /** "Motivo / feedback" column: editable reason (declines, on hold) with the original sheet feedback kept as reference. */
-export function FeedbackCell({ id, closeReason, legacyFeedback }: { id: string; closeReason: string | null; legacyFeedback: string | null }) {
+export function FeedbackCell({ id, closeReason, legacyFeedback, declined, declineReason, declinedBy, inferred }: { id: string; closeReason: string | null; legacyFeedback: string | null; declined?: boolean; declineReason?: string | null; declinedBy?: string | null; inferred?: boolean }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [text, setText] = useState(closeReason ?? "");
+  const initialDecline = (): DeclineValue => ({ declineReason: (declineReason as DeclineReasonKey | null) ?? null, declinedBy: (declinedBy as DeclinedByKey | null) ?? "LETO", closeReason: closeReason ?? "" });
+  const [decline, setDecline] = useState<DeclineValue>(initialDecline);
   const [pending, start] = useTransition();
   const shown = closeReason ?? legacyFeedback;
+  const reasonLabel = declineReason ? DECLINE_REASON_SHORT[declineReason as DeclineReasonKey] ?? declineReason : null;
   return (
-    <Popover open={open} onOpenChange={(o) => { setOpen(o); if (o) setText(closeReason ?? ""); }}>
+    <Popover open={open} onOpenChange={(o) => { setOpen(o); if (o) { setText(closeReason ?? ""); setDecline(initialDecline()); } }}>
       <PopoverTrigger asChild>
-        <button onClick={(e) => e.stopPropagation()} className={cn("w-full text-left rounded px-1 -mx-1 hover:bg-muted text-xs leading-snug truncate block", !shown && "italic text-muted-foreground", pending && "opacity-50")} title={shown ?? "Registrar motivo / feedback"}>
-          {shown ?? "motivo / feedback"}
+        <button onClick={(e) => e.stopPropagation()} className={cn("w-full text-left rounded px-1 -mx-1 hover:bg-muted text-xs leading-snug block", !shown && !reasonLabel && "italic text-muted-foreground", pending && "opacity-50")} title={[reasonLabel, declinedBy ? DECLINED_BY_LABELS[declinedBy as DeclinedByKey] : null, shown].filter(Boolean).join(" · ") || "Registrar motivo / feedback"}>
+          {reasonLabel && (
+            <span className={cn("mr-1 inline-block rounded px-1 py-px text-[10px] font-semibold align-middle", declinedBy === "CONTRAPARTE" ? "bg-warning/20 text-warning" : "bg-danger/10 text-danger", inferred && "opacity-70")} title={inferred ? "Classificado automaticamente a partir do texto da planilha" : undefined}>
+              {reasonLabel}{inferred ? "*" : ""}
+            </span>
+          )}
+          {declined && !reasonLabel && <span className="mr-1 inline-block rounded px-1 py-px text-[10px] font-semibold align-middle bg-muted text-muted-foreground not-italic">sem motivo</span>}
+          <span className="truncate">{shown ?? (reasonLabel ? "" : "motivo / feedback")}</span>
         </button>
       </PopoverTrigger>
-      <PopoverContent className="w-[400px]" align="start" onClick={(e) => e.stopPropagation()}>
+      <PopoverContent className="w-[420px]" align="start" onClick={(e) => e.stopPropagation()}>
         <form
           className="space-y-2"
           onSubmit={(e) => {
             e.preventDefault();
             start(async () => {
-              const res = await quickUpdateOpportunity(id, { closeReason: text || null });
+              const res = await quickUpdateOpportunity(id, declined ? { closeReason: decline.closeReason.trim() || null, declineReason: decline.declineReason, declinedBy: decline.declinedBy } : { closeReason: text || null });
               if (!res.ok) toast.error(res.error);
               else {
                 setOpen(false);
@@ -142,8 +153,15 @@ export function FeedbackCell({ id, closeReason, legacyFeedback }: { id: string; 
             });
           }}
         >
-          <div className="text-2xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1"><MessageSquareText className="h-3 w-3" /> Motivo da negativa / feedback</div>
-          <Textarea value={text} onChange={(e) => setText(e.target.value)} rows={3} className="text-xs" placeholder="Ex.: Garantias insuficientes; TIR abaixo do mínimo do fundo." />
+          <div className="text-2xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1"><MessageSquareText className="h-3 w-3" /> {declined ? "Motivo da recusa" : "Motivo / feedback"}</div>
+          {declined ? (
+            <>
+              <DeclineFields value={decline} onChange={setDecline} compact />
+              {inferred && declineReason && <p className="text-2xs text-muted-foreground">* motivo classificado automaticamente a partir do texto da planilha; ao salvar, passa a valer o que você escolher.</p>}
+            </>
+          ) : (
+            <Textarea value={text} onChange={(e) => setText(e.target.value)} rows={3} className="text-xs" placeholder="Ex.: Garantias insuficientes; TIR abaixo do mínimo do fundo." />
+          )}
           {legacyFeedback && (
             <div className="rounded border bg-muted/40 p-2 text-2xs">
               <div className="font-semibold text-muted-foreground mb-0.5 flex items-center gap-1"><History className="h-3 w-3" /> Feedback original da planilha</div>

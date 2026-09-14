@@ -105,6 +105,25 @@ model OperationTypeMapping {
 }
 
 /// Structured pipeline status. `outcome` separates operational stage from final result.
+enum DeclineReason {
+  SEM_FIT
+  GARANTIA_RISCO
+  PRECO_RETORNO
+  CREDITO_FRACO
+  PRAZO
+  TICKET
+  ATIVO_RESOLVIDO
+  PERDEMOS_CONCORRENTE
+  CONTRAPARTE_DESISTIU
+  NAO_PARTICIPAMOS
+  OUTRO
+}
+
+enum DeclinedBy {
+  LETO
+  CONTRAPARTE
+}
+
 enum Outcome {
   OPEN
   WON
@@ -319,6 +338,12 @@ model Opportunity {
   lastActivityAt    DateTime?
   closedAt          DateTime?
   closeReason       String?
+  /// Structured decline reason (chosen when the opportunity is declined; inferred from legacy text for the import).
+  declineReason         DeclineReason?
+  /// Who walked away: Leto declined the deal, or the counterparty declined/gave up.
+  declinedBy            DeclinedBy?
+  /// True when declineReason/declinedBy were inferred from free text instead of chosen by a person.
+  declineReasonInferred Boolean        @default(false)
 
   /// Preserved original responsible-person cell ("Christopher/Antonio").
   assigneesRaw      String?

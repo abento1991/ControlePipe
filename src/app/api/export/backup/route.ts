@@ -1,3 +1,4 @@
+import { DECLINE_REASON_LABELS, DECLINED_BY_LABELS } from "@/lib/normalization/decline-reasons";
 import { NextResponse } from "next/server";
 import * as XLSX from "xlsx";
 import { auth } from "@/auth";
@@ -52,6 +53,9 @@ export async function GET() {
       "Status da operação (planilha)": o.legacyStatusText ?? "",
       "Feedback (planilha)": o.legacyFeedback ?? "",
       "Motivo / feedback": o.closeReason ?? "",
+      "Motivo (categoria)": o.declineReason ? DECLINE_REASON_LABELS[o.declineReason] : "",
+      "Quem recusou": o.declinedBy ? DECLINED_BY_LABELS[o.declinedBy] : "",
+      "Motivo inferido do texto": o.declineReason ? (o.declineReasonInferred ? "sim" : "não") : "",
       Descrição: o.description ?? "",
       "Notas de análise": o.notes.map((n) => `[${d(n.createdAt)}] ${n.body}`).join("\n"),
       "Criado em": dt(o.createdAt),

@@ -133,7 +133,7 @@ export function buildColumns(opts: { quickEdit: boolean; showReactivate?: boolea
       header: "Motivo / feedback",
       size: 220,
       enableSorting: false,
-      cell: ({ row }) => <FeedbackCell id={row.original.id} closeReason={row.original.closeReason} legacyFeedback={row.original.legacyFeedback} />,
+      cell: ({ row }) => <FeedbackCell id={row.original.id} closeReason={row.original.closeReason} legacyFeedback={row.original.legacyFeedback} declined={row.original.status.outcome === "LOST"} declineReason={row.original.declineReason} declinedBy={row.original.declinedBy} inferred={row.original.declineReasonInferred} />,
     },
     { id: "amount", accessorKey: "amount", header: "Valor (R$ mm)", size: 100, cell: ({ row }) => (opts.quickEdit ? <AmountCell id={row.original.id} value={row.original.amount} raw={row.original.amountRaw} /> : <span className="tabular text-xs">{row.original.amount !== null ? formatMM(row.original.amount) : row.original.amountRaw ? <span className="text-muted-foreground">{row.original.amountRaw}</span> : "—"}</span>) },
     { id: "nextAction", accessorKey: "nextAction", header: "Próxima ação", size: 180, enableSorting: false, cell: ({ row }) => (opts.quickEdit ? <NextActionCell id={row.original.id} value={row.original.nextAction} /> : <span className="text-xs truncate block">{row.original.nextAction ?? "—"}</span>) },

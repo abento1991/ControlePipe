@@ -3,6 +3,26 @@ import { STATUS_DEFINITIONS } from "./normalization/status";
 import { OPERATION_TYPE_DEFINITIONS } from "./normalization/operation-types";
 import { TEAM_MEMBERS } from "./normalization/assignees";
 import { initialsOf } from "./normalization/text";
+import { inferDeclineReason } from "./normalization/decline-reasons";
+
+/**
+ * Fills the structured decline reason of declined opportunities that only carry free text (legacy sheet or
+ * older closes), marking them as inferred. Never touches a reason chosen by a person.
+ */
+export async function backfillDeclineReasons(prisma: PrismaClient): Promise<number> {
+  const rows = await prisma.opportunity.findMany({
+    where: { isDeleted: false, declineReason: null, status: { outcome: "LOST" } },
+    select: { id: true, closeReason: true, legacyFeedback: true },
+  });
+  let n = 0;
+  for (const o of rows) {
+    const inferred = inferDeclineReason(o.closeReason || o.legacyFeedback);
+    if (!inferred) continue;
+    await prisma.opportunity.update({ where: { id: o.id }, data: { declineReason: inferred.reason, declinedBy: inferred.declinedBy, declineReasonInferred: true } });
+    n++;
+  }
+  return n;
+}
 
 /** Idempotently seeds statuses, operation types and team users. Safe to run many times. */
 export async function seedReferenceData(prisma: PrismaClient, opts: { passwordHash?: string | null } = {}) {
@@ -44,4 +64,6 @@ export async function seedReferenceData(prisma: PrismaClient, opts: { passwordHa
       });
     }
   }
+  const inferred = await backfillDeclineReasons(prisma);
+  if (inferred) console.log(`Decline reasons inferred from legacy text: ${inferred}`);
 }
