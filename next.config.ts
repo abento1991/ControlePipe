@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
   experimental: {
     serverActions: { bodySizeLimit: "4mb" },
   },
-  serverExternalPackages: ["@prisma/client", "bcryptjs", "xlsx"],
+  serverExternalPackages: ["@prisma/client", "bcryptjs", "xlsx", "nodemailer"],
 };
 
 export default nextConfig;

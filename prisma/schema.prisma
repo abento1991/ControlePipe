@@ -701,3 +701,31 @@ model DataQualityIssue {
   @@index([code, resolved])
   @@index([opportunityId])
 }
+
+// ---------------------------------------------------------------------------
+// Background jobs (e.g. the e-mailed backup). One row per run; (job, bucket) is unique so a
+// scheduled run happens once per period even with restarts or several instances.
+// ---------------------------------------------------------------------------
+
+enum JobRunStatus {
+  RUNNING
+  OK
+  ERROR
+}
+
+model JobRun {
+  id         String       @id @default(cuid())
+  job        String
+  bucket     String
+  trigger    String       @default("scheduled")
+  status     JobRunStatus @default(RUNNING)
+  startedAt  DateTime     @default(now())
+  finishedAt DateTime?
+  detail     String?
+  bytes      Int?
+  recipients String?
+  userId     String?
+
+  @@unique([job, bucket])
+  @@index([job, startedAt])
+}

@@ -5,6 +5,18 @@ produção naquele momento. Para voltar a uma versão: pedir a reversão (um com
 trabalho, que o Railway publica sozinho) ou usar *Redeploy* em um deploy antigo no painel do Railway.
 Os dados ficam no banco, não no git: antes de mudanças grandes, gerar um "Exportar Excel (backup)".
 
+## v1.4.0 — 2026-09-15 · backup automático por e-mail
+Branch: `baseline/v1.4.0`
+
+- O app gera o Excel completo (agora com a aba "Tarefas administrativas") e **envia por e-mail** no
+  horário programado: semanal (padrão: segunda às 06h, horário de São Paulo) ou diário. Roda dentro do
+  próprio app, uma vez por período, mesmo com reinícios.
+- Nova tela **Administração → Backups**: configuração atual, histórico de envios e o botão
+  "Enviar backup agora" para testar.
+- Envio por SMTP (qualquer caixa com senha de app) ou pela API do Resend. Variáveis: `BACKUP_EMAIL_TO`,
+  `BACKUP_FREQUENCY`, `BACKUP_DAY`, `BACKUP_HOUR`, e `SMTP_*`/`MAIL_FROM` ou `RESEND_API_KEY`.
+- Estrutura do banco: migration `20260915212316_job_runs`.
+
 ## v1.3.1 — 2026-09-15 · troca de base das tarefas administrativas
 Branch: `baseline/v1.3.1`
 

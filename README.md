@@ -143,6 +143,8 @@ PostgreSQL + Prisma. Entidades principais (ver `prisma/schema.prisma`):
 | `APP_PASSWORD` | **senha única de acesso** da equipe (modo recomendado para começar): a tela de login pede só essa senha; opcionalmente a pessoa marca seu nome para atribuição das ações (senão fica como "Equipe Leto") |
 | `SEED_DEFAULT_PASSWORD` | senha inicial por usuário (modo alternativo, e-mail + senha individual) |
 | `PIPELINE_WORKBOOK` | caminho da planilha usado por `npm run import:pipeline` |
+| `BACKUP_EMAIL_TO` | destinatários do backup automático por e-mail (lista separada por vírgula). Com `BACKUP_FREQUENCY` (`weekly`/`daily`), `BACKUP_DAY` (0–6) e `BACKUP_HOUR` (0–23, horário de São Paulo) |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | envio por SMTP (qualquer caixa com senha de app). Alternativa: `RESEND_API_KEY` (API do Resend) |
 
 Nenhuma senha é armazenada em código. `.env` está no `.gitignore`; use `.env.example` como modelo.
 

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Kanban, UserCircle2, ClipboardList, PauseCircle, Layers, Users, Building2, BarChart3, Settings, ChevronLeft, ChevronRight, X, ShieldCheck, ListChecks, FileSpreadsheet, History, Tags } from "lucide-react";
+import { LayoutDashboard, Kanban, UserCircle2, ClipboardList, Mail, PauseCircle, Layers, Users, Building2, BarChart3, Settings, ChevronLeft, ChevronRight, X, ShieldCheck, ListChecks, FileSpreadsheet, History, Tags } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -24,6 +24,7 @@ const ADMIN = [
   { href: "/admin/operation-types", label: "Tipos de operação", icon: Tags },
   { href: "/admin/data-quality", label: "Data Quality", icon: ListChecks },
   { href: "/admin/imports", label: "Importações", icon: FileSpreadsheet },
+  { href: "/admin/backups", label: "Backups", icon: Mail },
   { href: "/admin/audit", label: "Auditoria", icon: History },
 ];
 
