@@ -233,7 +233,7 @@ export function OpportunityTable({ rows, total, page, pageSize, storageKey, quic
       sorting={sorting}
       onSortingChange={(s) => set({ sort: s[0]?.id ?? null, dir: s[0] ? (s[0].desc ? "desc" : "asc") : null }, { resetPage: false })}
       pagination={total > pageSize ? { page, pageSize, total, onPageChange: (p) => set({ page: String(p) }, { resetPage: false }), onPageSizeChange: (s) => set({ pageSize: String(s) }) } : undefined}
-      footer={<span className="text-xs text-muted-foreground tabular">{total.toLocaleString("pt-BR")} registros · tabela única, sem páginas</span>}
+      footer={<span className="text-xs text-muted-foreground tabular">{total.toLocaleString("pt-BR")} registros</span>}
       selection={{ selected, onChange: setSelected }}
       exportHref={exportHref}
       columnLabels={OPPORTUNITY_COLUMN_LABELS}

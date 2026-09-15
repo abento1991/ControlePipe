@@ -30,6 +30,9 @@ export const ADMIN_TASK_PRIORITIES: { key: AdminTaskPriorityKey; label: string }
 ];
 export const ADMIN_TASK_PRIORITY_LABELS = Object.fromEntries(ADMIN_TASK_PRIORITIES.map((p) => [p.key, p.label])) as Record<AdminTaskPriorityKey, string>;
 
+/** Once the team validated the list, the source pipeline rows are hidden (soft-deleted) on boot. */
+export const RETIRE_LEGACY_ADMIN_TASK_SOURCES = true;
+
 /**
  * Historical pipeline rows (legacy # from the spreadsheet) that are administrative work rather than opportunities.
  * They are duplicated into admin tasks first; the pipeline rows stay untouched until the team agrees to swap.

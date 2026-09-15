@@ -4,7 +4,7 @@ import { OPERATION_TYPE_DEFINITIONS } from "./normalization/operation-types";
 import { TEAM_MEMBERS } from "./normalization/assignees";
 import { initialsOf } from "./normalization/text";
 import { inferDeclineReason } from "./normalization/decline-reasons";
-import { LEGACY_ADMIN_TASKS } from "./normalization/admin-tasks";
+import { LEGACY_ADMIN_TASKS, RETIRE_LEGACY_ADMIN_TASK_SOURCES } from "./normalization/admin-tasks";
 
 /**
  * Fills the structured decline reason of declined opportunities that only carry free text (legacy sheet or
@@ -66,6 +66,28 @@ export async function backfillAdminTasks(prisma: PrismaClient): Promise<number> 
   return created;
 }
 
+/**
+ * Swap of the bases: hides (soft-deletes) the pipeline rows that were duplicated as administrative tasks, so the
+ * task becomes the only version. Reversible (isDeleted flag + audit log). Runs once per row.
+ */
+export async function retireLegacyAdminTaskSources(prisma: PrismaClient): Promise<number> {
+  if (!RETIRE_LEGACY_ADMIN_TASK_SOURCES) return 0;
+  const legacyIds = LEGACY_ADMIN_TASKS.map((t) => t.legacyId);
+  const tasks = await prisma.adminTask.findMany({ where: { sourceLegacyId: { in: legacyIds }, sourceOpportunityId: { not: null } }, select: { id: true, sourceOpportunityId: true, sourceLegacyId: true } });
+  let retired = 0;
+  for (const t of tasks) {
+    const opp = await prisma.opportunity.findFirst({ where: { id: t.sourceOpportunityId!, isDeleted: false }, select: { id: true, name: true } });
+    if (!opp) continue;
+    await prisma.$transaction([
+      prisma.opportunity.update({ where: { id: opp.id }, data: { isDeleted: true } }),
+      prisma.auditLog.create({ data: { entity: "Opportunity", entityId: opp.id, opportunityId: opp.id, action: "moved_to_admin_task", field: "isDeleted", oldValue: "false", newValue: `true (tarefa administrativa ${t.id})` } }),
+      prisma.adminTaskUpdate.create({ data: { taskId: t.id, body: `Caso #${t.sourceLegacyId ?? ""} removido do pipe: era tarefa administrativa, não oportunidade.`, occurredAt: new Date() } }),
+    ]);
+    retired++;
+  }
+  return retired;
+}
+
 /** Idempotently seeds statuses, operation types and team users. Safe to run many times. */
 export async function seedReferenceData(prisma: PrismaClient, opts: { passwordHash?: string | null } = {}) {
   for (const s of STATUS_DEFINITIONS) {
@@ -110,4 +132,6 @@ export async function seedReferenceData(prisma: PrismaClient, opts: { passwordHa
   if (inferred) console.log(`Decline reasons inferred from legacy text: ${inferred}`);
   const tasks = await backfillAdminTasks(prisma);
   if (tasks) console.log(`Administrative tasks duplicated from legacy rows: ${tasks}`);
+  const retired = await retireLegacyAdminTaskSources(prisma);
+  if (retired) console.log(`Pipeline rows hidden after moving to administrative tasks: ${retired}`);
 }

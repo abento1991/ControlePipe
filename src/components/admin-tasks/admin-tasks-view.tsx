@@ -147,7 +147,7 @@ function TaskRow({ t, selected, onSelect }: { t: AdminTaskDTO; selected: boolean
             <StatusPill status={t.status} />
             <span>{ADMIN_TASK_CATEGORY_LABELS[t.category as AdminTaskCategoryKey]}</span>
             {t.counterpart && <span>· {t.counterpart}</span>}
-            {t.source && <span className="inline-flex items-center gap-0.5 text-leto-green-deep"><Copy className="h-2.5 w-2.5" /> do pipe{t.source.legacyId ? ` #${t.source.legacyId}` : ""}</span>}
+            {t.source && <span className={cn("inline-flex items-center gap-0.5", t.source.removedFromPipe ? "text-muted-foreground" : "text-leto-green-deep")}><Copy className="h-2.5 w-2.5" /> {t.source.removedFromPipe ? "ex-pipe" : "do pipe"}{t.source.legacyId ? ` #${t.source.legacyId}` : ""}</span>}
           </div>
           {t.lastUpdate && (
             <div className="mt-0.5 truncate text-2xs text-muted-foreground">
@@ -220,11 +220,12 @@ function TaskDetail({ t, team, isAdmin, onDeleted }: { t: AdminTaskDTO; team: Ad
         <div className="flex items-start justify-between gap-3">
           <Input value={title} onChange={(e) => setTitle(e.target.value)} onBlur={() => title.trim() !== t.title && title.trim().length >= 2 && save({ title: title.trim() })} className="h-9 text-base font-semibold border-transparent bg-transparent px-1 -mx-1 hover:border-input focus:border-input" />
           <div className="flex items-center gap-1 shrink-0">
-            {t.source && (
+            {t.source && !t.source.removedFromPipe && (
               <Link href={`/opportunities/${t.source.id}`} className="inline-flex items-center gap-0.5 text-xs text-leto-green-deep hover:underline whitespace-nowrap" title={`Duplicada do caso ${t.source.name} (${t.source.status})`}>
                 caso no pipe{t.source.legacyId ? ` #${t.source.legacyId}` : ""} <ArrowUpRight className="h-3 w-3" />
               </Link>
             )}
+            {t.source?.removedFromPipe && <span className="text-xs text-muted-foreground whitespace-nowrap" title={`Era o caso ${t.source.name} no pipe; removido de lá após a troca de base`}>era o caso #{t.source.legacyId ?? "?"} do pipe</span>}
             {isAdmin && (
               <Button size="icon-sm" variant="ghost" title="Excluir tarefa" disabled={pending} onClick={() => { if (confirm("Excluir esta tarefa?")) start(async () => { const r = await deleteAdminTask(t.id); if (!r.ok) toast.error(r.error); else { toast.success("Tarefa excluída."); onDeleted(); router.refresh(); } }); }}>
                 <Trash2 className="text-muted-foreground" />

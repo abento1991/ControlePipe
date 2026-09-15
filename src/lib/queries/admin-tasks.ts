@@ -31,7 +31,7 @@ export async function getAdminTasks(filters: AdminTaskFilters = {}, now: Date = 
     prisma.user.findMany({ where: { isActive: true, isArchived: false }, orderBy: { name: "asc" }, select: { id: true, name: true, initials: true, color: true } }),
   ]);
   const sourceIds = rows.map((r) => r.sourceOpportunityId).filter((x): x is string => !!x);
-  const sources = sourceIds.length ? await prisma.opportunity.findMany({ where: { id: { in: sourceIds } }, select: { id: true, name: true, legacyId: true, status: { select: { name: true } } } }) : [];
+  const sources = sourceIds.length ? await prisma.opportunity.findMany({ where: { id: { in: sourceIds } }, select: { id: true, name: true, legacyId: true, isDeleted: true, status: { select: { name: true } } } }) : [];
   const sourceById = new Map(sources.map((s) => [s.id, s]));
   const statusRank: Record<string, number> = { IN_PROGRESS: 0, TODO: 1, WAITING: 2, DONE: 3, CANCELED: 4 };
   const prioRank: Record<string, number> = { HIGH: 0, MEDIUM: 1, LOW: 2 };
@@ -60,7 +60,7 @@ export async function getAdminTasks(filters: AdminTaskFilters = {}, now: Date = 
         createdBy: t.createdBy?.name ?? null,
         lastUpdate: t.updates[0] ? { body: t.updates[0].body, date: t.updates[0].occurredAt.toISOString(), user: t.updates[0].user?.name ?? null } : null,
         updatesCount: t._count.updates,
-        source: src ? { id: src.id, name: src.name, legacyId: src.legacyId, status: src.status.name } : null,
+        source: src ? { id: src.id, name: src.name, legacyId: src.legacyId, status: src.status.name, removedFromPipe: src.isDeleted } : null,
       };
     })
     .sort((a, b) => {

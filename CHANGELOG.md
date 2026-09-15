@@ -5,6 +5,14 @@ produção naquele momento. Para voltar a uma versão: pedir a reversão (um com
 trabalho, que o Railway publica sozinho) ou usar *Redeploy* em um deploy antigo no painel do Railway.
 Os dados ficam no banco, não no git: antes de mudanças grandes, gerar um "Exportar Excel (backup)".
 
+## v1.3.1 — 2026-09-15 · troca de base das tarefas administrativas
+Branch: `baseline/v1.3.1`
+
+- Os 14 casos históricos duplicados na v1.3.0 saíram do pipe (ocultos, não apagados; registro na
+  auditoria com a ação `moved_to_admin_task`). As tarefas administrativas passam a ser a versão única e
+  mostram "era o caso #N do pipe".
+- Rodapé das tabelas mostra só o número de registros.
+
 ## v1.3.0 — 2026-09-15 · Tarefas administrativas
 Branch: `baseline/v1.3.0`
 
