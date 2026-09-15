@@ -41,7 +41,8 @@ d("queries & metrics", () => {
   it("computes dashboard KPIs from the database", async () => {
     const { getDashboardData } = await import("@/lib/queries/dashboard");
     const data = await getDashboardData({});
-    expect(data.kpi.total).toBeGreaterThanOrEqual(900);
+    // 903 sheet rows minus the 14 legacy rows moved to administrative tasks (see LEGACY_ADMIN_TASKS).
+    expect(data.kpi.total).toBeGreaterThanOrEqual(880);
     expect(data.kpi.active + data.kpi.onHold + data.kpi.concluded + data.kpi.declined).toBeLessThanOrEqual(data.kpi.total);
     expect(data.kpi.concluded).toBeGreaterThanOrEqual(20);
     expect(data.kpi.conversionRate).toBeGreaterThan(0);
