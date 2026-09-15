@@ -20,9 +20,21 @@ export async function sendMail(msg: MailMessage): Promise<{ provider: string; id
     // Loaded at runtime only: the instrumentation file is also compiled for the edge runtime, where node built-ins are absent.
     const nodemailer = (await import(/* webpackIgnore: true */ "nodemailer")).default as typeof import("nodemailer");
     const port = Number(process.env.SMTP_PORT || 587);
-    const transport = nodemailer.createTransport({ host: process.env.SMTP_HOST, port, secure: process.env.SMTP_SECURE === "true" || port === 465, auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS } });
-    const info = await transport.sendMail({ from: mailFrom(), to: msg.to.join(", "), subject: msg.subject, text: msg.text, html: msg.html, attachments: msg.attachments?.map((a) => ({ filename: a.filename, content: a.content, contentType: a.contentType })) });
-    return { provider, id: info.messageId ?? null };
+    // Some hosts block one of the SMTP ports: try the configured port, then the other common one (587 <-> 465).
+    const ports = port === 465 ? [465, 587] : [port, 465];
+    let lastError: unknown = null;
+    for (const p of ports) {
+      try {
+        const transport = nodemailer.createTransport({ host: process.env.SMTP_HOST, port: p, secure: process.env.SMTP_SECURE === "true" || p === 465, auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }, connectionTimeout: 20_000, greetingTimeout: 20_000, socketTimeout: 120_000 });
+        const info = await transport.sendMail({ from: mailFrom(), to: msg.to.join(", "), subject: msg.subject, text: msg.text, html: msg.html, attachments: msg.attachments?.map((a) => ({ filename: a.filename, content: a.content, contentType: a.contentType })) });
+        return { provider, id: info.messageId ?? null };
+      } catch (e) {
+        lastError = e;
+        const code = (e as { code?: string }).code;
+        if (!(code === "ETIMEDOUT" || code === "ECONNECTION" || code === "ESOCKET" || /timeout/i.test((e as Error).message))) throw e;
+      }
+    }
+    throw new Error(`SMTP inacessível nas portas ${ports.join(" e ")} (${(lastError as Error)?.message ?? "timeout"}). O provedor de hospedagem pode bloquear SMTP; use a API do Resend.`);
   }
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
