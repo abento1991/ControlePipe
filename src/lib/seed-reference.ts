@@ -4,6 +4,7 @@ import { OPERATION_TYPE_DEFINITIONS } from "./normalization/operation-types";
 import { TEAM_MEMBERS } from "./normalization/assignees";
 import { initialsOf } from "./normalization/text";
 import { inferDeclineReason } from "./normalization/decline-reasons";
+import { LEGACY_ADMIN_TASKS } from "./normalization/admin-tasks";
 
 /**
  * Fills the structured decline reason of declined opportunities that only carry free text (legacy sheet or
@@ -22,6 +23,47 @@ export async function backfillDeclineReasons(prisma: PrismaClient): Promise<numb
     n++;
   }
   return n;
+}
+
+/**
+ * Duplicates the historical pipeline rows listed in LEGACY_ADMIN_TASKS as administrative tasks (once per source
+ * opportunity). The pipeline rows are left untouched until the team decides to swap the bases.
+ */
+export async function backfillAdminTasks(prisma: PrismaClient): Promise<number> {
+  let created = 0;
+  for (const def of LEGACY_ADMIN_TASKS) {
+    const opp = await prisma.opportunity.findFirst({
+      where: { legacyId: def.legacyId, isDeleted: false },
+      include: { status: true, assignees: { select: { userId: true } }, activities: { where: { type: { in: ["LEGACY_STATUS", "LEGACY_FEEDBACK", "NOTE", "MEETING_SNAPSHOT"] } }, orderBy: [{ occurredAt: "asc" }, { createdAt: "asc" }] } },
+    });
+    if (!opp) continue;
+    const existing = await prisma.adminTask.findUnique({ where: { sourceOpportunityId: opp.id } });
+    if (existing) continue;
+    const status = opp.status.group === "CONCLUDED" ? "DONE" : opp.status.group === "CLOSED" ? "CANCELED" : opp.status.group === "ON_HOLD" ? "WAITING" : "IN_PROGRESS";
+    const done = status === "DONE" || status === "CANCELED";
+    const descriptionParts = [def.note, opp.closeReason || opp.legacyFeedback].filter(Boolean);
+    const updates = opp.activities.filter((a) => (a.body ?? "").trim()).map((a) => ({ body: (a.body ?? "").trim(), occurredAt: a.occurredAt, isLegacy: true }));
+    const last = updates.length ? updates[updates.length - 1].occurredAt : opp.lastActivityAt ?? opp.updatedAt;
+    await prisma.adminTask.create({
+      data: {
+        title: def.title,
+        category: def.category,
+        status,
+        priority: "MEDIUM",
+        counterpart: def.counterpart ?? opp.originatorRaw ?? null,
+        description: descriptionParts.length ? descriptionParts.join("\n\n") : null,
+        sourceOpportunityId: opp.id,
+        sourceLegacyId: opp.legacyId,
+        completedAt: done ? opp.closedAt ?? opp.exitDate ?? last : null,
+        lastActivityAt: last,
+        createdAt: opp.entryDate ?? opp.createdAt,
+        assignees: { create: opp.assignees.map((a) => ({ userId: a.userId })) },
+        updates: { create: updates },
+      },
+    });
+    created++;
+  }
+  return created;
 }
 
 /** Idempotently seeds statuses, operation types and team users. Safe to run many times. */
@@ -66,4 +108,6 @@ export async function seedReferenceData(prisma: PrismaClient, opts: { passwordHa
   }
   const inferred = await backfillDeclineReasons(prisma);
   if (inferred) console.log(`Decline reasons inferred from legacy text: ${inferred}`);
+  const tasks = await backfillAdminTasks(prisma);
+  if (tasks) console.log(`Administrative tasks duplicated from legacy rows: ${tasks}`);
 }

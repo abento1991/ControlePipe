@@ -46,8 +46,93 @@ model User {
   followUps        FollowUp[]
   attachments      Attachment[]
   contactInteractions ContactInteraction[]
+  adminTaskAssignments AdminTaskAssignee[]
+  adminTaskUpdates     AdminTaskUpdate[]
+  createdAdminTasks    AdminTask[]          @relation("AdminTaskCreator")
 
   @@index([isArchived, isActive])
+}
+
+// ---------------------------------------------------------------------------
+// Administrative tasks: internal work that is not a pipeline opportunity
+// (presentations, originator relationship, fund structuring, vendors, marketing).
+// ---------------------------------------------------------------------------
+
+enum AdminTaskCategory {
+  APRESENTACAO_MATERIAL
+  RELACIONAMENTO_ORIGINADOR
+  FUNDO_ESTRUTURA
+  FERRAMENTAS_FORNECEDORES
+  JURIDICO_COMPLIANCE
+  MARKETING_COMUNICACAO
+  INTERNO_OUTRO
+}
+
+enum AdminTaskStatus {
+  TODO
+  IN_PROGRESS
+  WAITING
+  DONE
+  CANCELED
+}
+
+enum AdminTaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model AdminTask {
+  id          String            @id @default(cuid())
+  title       String
+  description String?
+  category    AdminTaskCategory @default(INTERNO_OUTRO)
+  status      AdminTaskStatus   @default(TODO)
+  priority    AdminTaskPriority @default(MEDIUM)
+  dueAt       DateTime?
+  completedAt DateTime?
+  /// Counterparty / context (e.g. the originator or vendor involved).
+  counterpart String?
+  /// When the task was duplicated from a pipeline row, the source opportunity (kept until the bases are swapped).
+  sourceOpportunityId String?
+  sourceLegacyId      Int?
+  isDeleted   Boolean           @default(false)
+  createdById String?
+  createdBy   User?             @relation("AdminTaskCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  lastActivityAt DateTime?
+
+  assignees AdminTaskAssignee[]
+  updates   AdminTaskUpdate[]
+
+  @@unique([sourceOpportunityId])
+  @@index([status, dueAt])
+  @@index([category])
+}
+
+model AdminTaskAssignee {
+  taskId String
+  task   AdminTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId String
+  user   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, userId])
+  @@index([userId])
+}
+
+model AdminTaskUpdate {
+  id         String    @id @default(cuid())
+  taskId     String
+  task       AdminTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  body       String
+  occurredAt DateTime  @default(now())
+  isLegacy   Boolean   @default(false)
+  userId     String?
+  user       User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt  DateTime  @default(now())
+
+  @@index([taskId, occurredAt])
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

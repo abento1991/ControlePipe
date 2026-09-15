@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { AlertTriangle, ArrowLeft, Building2, CalendarClock, CheckCircle2, ExternalLink, Mail, MessageCircle, MoreHorizontal, PauseCircle, Pencil, Phone, PlayCircle, Trash2, User, XCircle } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Building2, CalendarClock, CheckCircle2, ExternalLink, Mail, MessageCircle, MoreHorizontal, PauseCircle, Pencil, Phone, PlayCircle, Trash2, User, XCircle, ClipboardList } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -23,6 +23,7 @@ import { AuditPanel, RawDataPanel } from "./audit-panel";
 import { OriginatorPanel } from "./originator-panel";
 import { useReference } from "@/components/layout/reference-context";
 import { closeOpportunity, reactivateOpportunity, deleteOpportunity } from "@/lib/actions/opportunities";
+import { duplicateOpportunityAsAdminTask } from "@/lib/actions/admin-tasks";
 import { DeclineFields, EMPTY_DECLINE, type DeclineValue } from "../decline-fields";
 import { DECLINE_REASON_LABELS, DECLINED_BY_LABELS, type DeclineReasonKey, type DeclinedByKey } from "@/lib/normalization/decline-reasons";
 import { CHANNEL_LABELS } from "@/lib/queries/dashboard";
@@ -131,6 +132,20 @@ export function OpportunityDetailView({ data: o, isAdmin }: { data: OpportunityD
                     <XCircle /> Marcar como inativa
                   </DropdownMenuItem>
                 )}
+                <DropdownMenuItem
+                  onSelect={() =>
+                    start(async () => {
+                      const res = await duplicateOpportunityAsAdminTask(o.id);
+                      if (!res.ok) toast.error(res.error);
+                      else {
+                        toast.success(res.data.existed ? "Já existe uma tarefa administrativa para este caso." : "Copiado para as tarefas administrativas.");
+                        router.push(`/tarefas?task=${res.data.id}`);
+                      }
+                    })
+                  }
+                >
+                  <ClipboardList /> Duplicar como tarefa administrativa
+                </DropdownMenuItem>
                 {isAdmin && (
                   <>
                     <DropdownMenuSeparator />

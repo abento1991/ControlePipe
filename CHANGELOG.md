@@ -5,6 +5,21 @@ produção naquele momento. Para voltar a uma versão: pedir a reversão (um com
 trabalho, que o Railway publica sozinho) ou usar *Redeploy* em um deploy antigo no painel do Railway.
 Os dados ficam no banco, não no git: antes de mudanças grandes, gerar um "Exportar Excel (backup)".
 
+## v1.3.0 — 2026-09-15 · Tarefas administrativas
+Branch: `baseline/v1.3.0`
+
+- Nova seção **Tarefas administrativas** (menu, abaixo de Minha mesa): trabalho interno que não é caso do
+  pipe. Lista à esquerda (abas Abertas / Concluídas / Todas, filtros por categoria e responsável, busca) e
+  tarefa selecionada à direita com status, categoria, prioridade, prazo, responsáveis, contraparte,
+  descrição, "Registrar andamento" e histórico.
+- Categorias: apresentações e materiais; relacionamento com originadores; fundos e estrutura;
+  ferramentas e fornecedores; jurídico e compliance; marketing e comunicação; interno / outro.
+- Botão "Nova tarefa" e, na página de qualquer caso, a ação "Duplicar como tarefa administrativa".
+- 14 casos históricos identificados como tarefas administrativas foram **duplicados** (não movidos) para
+  a nova seção, com histórico e responsáveis, e mostram o link "caso no pipe #N". A troca de base fica
+  para depois da validação.
+- Estrutura do banco: migration `20260915205142_admin_tasks` (aplicada sozinha no deploy).
+
 ## v1.2.2 — 2026-09-14 · waterfall do zero ao total de recusas
 Branch: `baseline/v1.2.2`
 
