@@ -17,5 +17,5 @@ export async function GET() {
   } catch {
     /* not running in the container */
   }
-  return NextResponse.json({ ok: db.ok, db, bootstrap, env: { authUrl: !!process.env.AUTH_URL, appPassword: !!process.env.APP_PASSWORD, databaseUrl: !!process.env.DATABASE_URL, authSecret: !!process.env.AUTH_SECRET } }, { status: db.ok ? 200 : 503 });
+  return NextResponse.json({ ok: db.ok, db, bootstrap, env: { authUrl: !!process.env.AUTH_URL, appPassword: !!process.env.APP_PASSWORD, databaseUrl: !!process.env.DATABASE_URL, authSecret: !!process.env.AUTH_SECRET, mailProvider: process.env.SMTP_HOST ? "smtp" : process.env.RESEND_API_KEY ? "resend" : null, mailFrom: !!process.env.MAIL_FROM, backupRecipients: (process.env.BACKUP_EMAIL_TO || "").split(/[,;\s]+/).filter(Boolean).length } }, { status: db.ok ? 200 : 503 });
 }
